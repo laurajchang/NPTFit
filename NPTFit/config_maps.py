@@ -31,7 +31,7 @@ class ConfigMaps(SetDirs):
         # Setup the directories needed by the code
         SetDirs.__init__(self, tag=tag, work_dir=work_dir)
 
-        # Initialise data, exposure and mask
+        # Initialise data, exposure, and mask
         self.count_map = []
         self.exposure_map = []
         self.mask_total = []
@@ -39,6 +39,10 @@ class ConfigMaps(SetDirs):
         # Initialise template dictionary and array
         self.templates = []
         self.templates_dict = {}
+
+        # Initialise flux map dictionary and array
+        self.flux_maps = []
+        self.flux_maps_dict = {}
 
     def load_data(self, count_map, exposure_map):
         """ Function to input analysis data
@@ -72,7 +76,7 @@ class ConfigMaps(SetDirs):
             'flux': Template in fluxes with units ph/cm^2/s
 
             .. note:: The exposure must be provided prior to adding a flux
-            template. This is then multipleid by the exposure.
+            template. This is then multiplied by the exposure.
         """
 
         if units == 'flux':
@@ -83,6 +87,34 @@ class ConfigMaps(SetDirs):
             template *= self.exposure_map
         self.templates_dict.update({label: template})
         self.templates.append(template)
+
+    def load_flux_map(self, flux_map, label, units='counts'):
+        """ Function to add a flux map to the flux map dictionary and array
+
+            Note maps should be exposure corrected, so that they model
+            the counts rather than flux, before being added
+
+            :param flux_map: Input flux map
+            :param label: String used to identify the flux map in
+            subsequent calls
+            :param units: Units of provided map. By default
+            'counts': Map in photon counts
+            'flux': Map in fluxes with units ph/cm^2/s
+
+            .. note:: The exposure must be provided prior to adding a flux
+            map. This is then multiplied by the exposure.
+        """
+
+        if units == 'flux':
+            assert (len(self.exposure_map) != 0), \
+                "Must provide exposure map before adding a flux map"
+            assert (len(self.exposure_map) == len(flux_map)), \
+                "Flux map must be the same shape as the exposure map"
+            flux_map *= self.exposure_map
+        flux_map /= np.mean(flux_map)
+        print("Flux map has mean", np.mean(flux_map), "counts")
+        self.flux_maps_dict.update({label: flux_map})
+        self.flux_maps.append(flux_map)
 
     def compress_data_and_templates(self):
         """ Compress data, exposure and templates
@@ -99,6 +131,11 @@ class ConfigMaps(SetDirs):
         # Number of pixels is fixed to be the length of the count_map
         self.npix = len(self.count_map)
 
+        # If no flux map inserted, set to uniform unit flux map
+        if len(self.flux_map) == 0:
+            print("No flux map set; defaulting to uniform flux map")
+            self.flux_map = np.ones(self.npix, dtype='float64')
+
         # If no mask inserted, set to blank mask
         if len(self.mask_total) == 0:
             print("No mask set; defaulting to a blank mask")
@@ -107,6 +144,8 @@ class ConfigMaps(SetDirs):
         # Check all inputs have the same length
         assert(len(self.exposure_map) == self.npix), \
             "Exposure map is a different shape to the data"
+        assert(len(self.flux_map) == self.npix), \
+            "Flux map has a different shape to the data"
         assert(len(self.mask_total) == self.npix), \
             "Mask has a different shape to the data"
         for key in self.templates_dict.keys():
@@ -134,6 +173,9 @@ class ConfigMaps(SetDirs):
             # Ensure still an integer array
             self.masked_compressed_data_expreg.append(np.array(
                  temp_data_expreg.compressed(), dtype='int32'))
+
+        # Compress flux map
+        self.compressed_flux_map = self.return_masked_compressed(self.flux_map)
 
         # Create a nested dictionary of different versions of the templates
         the_dict = self.templates_dict

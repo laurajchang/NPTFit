@@ -431,7 +431,7 @@ class NPTFScan(ConfigMaps):
             # In evaluating the likelihood extract the exposure region i
             # version of each parameter
             ll += npll.log_like(self.PT_sum_compressed[i], theta_ps_expreg,
-                                self.f_ary, self.df_rho_div_f_ary,
+                                self.f_ary, self.df_rho_div_f_ary, self.compressed_flux_map, 
                                 [NPT[i] for NPT in
                                  self.NPT_dist_compressed_exp_ary],
                                 self.masked_compressed_data_expreg[i])

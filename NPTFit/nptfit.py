@@ -36,6 +36,9 @@ class NPTF(NPTFScan):
         self.df_rho_div_f_ary = df_rho_div_f_ary
         self.nexp = nexp
 
+        # Prepare likelihood, data and templates for the scan
+        self.configure_for_scan_internal()
+
         # If no non-Poissonian models, use Poissonian likelihood
         if len(self.non_poiss_models) == 0:
             # Set number of exposure regions to 1 and define
@@ -45,6 +48,3 @@ class NPTF(NPTFScan):
         else:
             # Define the non-Poissonian likelihood
             self.ll = self.log_like_nptf
-
-        # Prepare likelihood, data and templates for the scan
-        self.configure_for_scan_internal()

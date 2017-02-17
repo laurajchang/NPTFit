@@ -20,14 +20,16 @@ cdef extern from "math.h":
     double pow(double x, double y) nogil
 
 
-def return_xs(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary,
-              double[::1] npt_compressed, int[::1] data):
+def return_xs(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary, 
+              double[::1] ft_compressed, double[::1] npt_compressed, int[::1] data):
     """ Returns arrays of x_m and x_m_sum for likelihood calculations
 
         :param theta: Array of parameters, [A, n[1], .., n[j+1], Sb[1], .., Sb[j]]
         :param f_ary: Photon leakage probabilities characterizing PSF, sum(f_ary) = 1.0
         :param df_rho_div_f_ary: df*rho(f)/f for integrating over f as a sum
-        :param npt_compressed: pixel-wise normalization of the PS template
+        :param ft_compressed: Pixel-wise flux template. For a nontrivial flux template, scaling
+        flux by a factor of c corresponds to scaling normalization A by 1/c and breaks Sb[j] by c.
+        :param npt_compressed: Pixel-wise normalization of the PS template
         :param data: The pixel-wise data
         :returns: A list containing (x_m, x_m_sum)
     """
@@ -35,25 +37,25 @@ def return_xs(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary
     cdef int n_break = int((len(theta) - 2)/2) 
 
     if n_break == 1:
-        return return_xs_1break(theta, f_ary, df_rho_div_f_ary, npt_compressed,
+        return return_xs_1break(theta, f_ary, df_rho_div_f_ary, ft_compressed, npt_compressed,
                                 data)
     elif n_break == 2:
-        return return_xs_2break(theta, f_ary, df_rho_div_f_ary, npt_compressed,
+        return return_xs_2break(theta, f_ary, df_rho_div_f_ary, ft_compressed, npt_compressed,
                                 data)
     elif n_break == 3:
-        return return_xs_3break(theta, f_ary, df_rho_div_f_ary, npt_compressed,
+        return return_xs_3break(theta, f_ary, df_rho_div_f_ary, ft_compressed, npt_compressed,
                                 data)
     else:
         return return_xs_lbreak(theta, n_break, f_ary, df_rho_div_f_ary, 
                                 npt_compressed, data)
+        print("Sorry, flux template not yet implemented!")
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
 @cython.initializedcheck(False)
-def return_xs_1break(double[::1] theta, double[::1] f_ary, 
-                     double[::1] df_rho_div_f_ary, double[::1] npt_compressed,
-                     int[::1] data):
+def return_xs_1break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary, 
+                     double[::1] ft_compressed, double[::1] npt_compressed, int[::1] data):
     """ Dedicated calculation of x_m and x_m_sum for 1 break 
     """
 
@@ -71,7 +73,7 @@ def return_xs_1break(double[::1] theta, double[::1] f_ary,
     cdef double[::1] g1_ary_f = np.zeros(k_max + 1, dtype=DTYPE)
     cdef double[::1] g2_ary_f = np.zeros(k_max + 1, dtype=DTYPE)
 
-    cdef double f2, df_rho_div_f2
+    cdef double f2, df_rho_div_f2, fluxfac
     cdef double pref1_x_m_ary, pref2_x_m_ary
     cdef double x_m_sum_f, x_m_ary_f
 
@@ -80,19 +82,20 @@ def return_xs_1break(double[::1] theta, double[::1] f_ary,
     for f_index in range(len(f_ary)):
         f2 = float(f_ary[f_index])
         df_rho_div_f2 = df_rho_div_f_ary[f_index]
-        
-        g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb * f2)
-        g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2, sb * f2)
-        
-        pref1_x_m_ary =  pow(sb * f2, n1)
-        pref2_x_m_ary = pow(sb * f2, n2)
 
         for p in range(npix_roi):
-            x_m_sum_f = a_ps*sb*f2*(1/(n1-1)+1/(1-n2)) * npt_compressed[p]
+            fluxfac = ft_compressed[p]
+
+            g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2,  sb * fluxfac * f2)
+        
+            pref1_x_m_ary =  pow(sb * fluxfac * f2, n1)
+            pref2_x_m_ary = pow(sb * fluxfac * f2, n2)
+
+            x_m_sum_f = a_ps/fluxfac*sb*fluxfac*f2*(1/(n1-1)+1/(1-n2)) * npt_compressed[p]
             x_m_sum[p] += df_rho_div_f2*x_m_sum_f
 
             for k in range(data[p]+1):
-                x_m_ary_f = a_ps * (pref1_x_m_ary*g1_ary_f[k]
+                x_m_ary_f = a_ps/fluxfac * (pref1_x_m_ary*g1_ary_f[k]
                             + pref2_x_m_ary*g2_ary_f[k]) * npt_compressed[p]
                 x_m_ary[p,k] += df_rho_div_f2*x_m_ary_f
             
@@ -104,9 +107,8 @@ def return_xs_1break(double[::1] theta, double[::1] f_ary,
 @cython.wraparound(False)
 @cython.cdivision(True)
 @cython.initializedcheck(False)
-def return_xs_2break(double[::1] theta, double[::1] f_ary, 
-                     double[::1] df_rho_div_f_ary, double[::1] npt_compressed,
-                     int[::1] data):
+def return_xs_2break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary, 
+                     double[::1] ft_compressed, double[::1] npt_compressed, int[::1] data):
     """ Dedicated calculation of x_m and x_m_sum for 2 breaks 
     """
 
@@ -127,7 +129,7 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
     cdef double[::1] g1_ary_f = np.zeros(k_max + 1)
     cdef double[::1] g2_ary_f = np.zeros(k_max + 1)
 
-    cdef double f2, df_rho_div_f2
+    cdef double f2, df_rho_div_f2, fluxfac
     cdef double pref0_x_m_ary, pref1_x_m_ary, pref2_x_m_ary
     cdef double first0_x_m_sum_ary, first1_x_m_sum_ary, first2_x_m_sum_ary
     cdef double second0_x_m_sum_ary, second1_x_m_sum_ary, second2_x_m_sum_ary
@@ -146,25 +148,27 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
     for f_index in range(len(f_ary)):
         f2 = float(f_ary[f_index])
         df_rho_div_f2 = df_rho_div_f_ary[f_index]
-        
-        g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * f2)
-        g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2) \
-                   - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * f2)
-        g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * f2)
-
-        pref0_x_m_ary = pow(sb1 * f2, n1)
-        pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * f2, n2 - n1)
-        pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * f2, n3 - n2)
 
         for p in range(npix_roi):
-            x_m_sum_f = a_ps * (sb1 * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary
+            fluxfac = ft_compressed[p]
+
+            g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * fluxfac * f2)
+            g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * fluxfac * f2) \
+                       - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * fluxfac * f2)
+            g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * fluxfac * f2)
+
+            pref0_x_m_ary = pow(sb1 * fluxfac * f2, n1)
+            pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * fluxfac * f2, n2 - n1)
+            pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * fluxfac * f2, n3 - n2)
+
+            x_m_sum_f = a_ps/fluxfac * (sb1 * fluxfac * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary
                         + first1_x_m_sum_ary*second1_x_m_sum_ary
                         + first2_x_m_sum_ary*second2_x_m_sum_ary) \
                         * npt_compressed[p]
             x_m_sum[p] += df_rho_div_f2 * x_m_sum_f
 
             for k in range(data[p]+1):
-                x_m_ary_f = a_ps * (pref0_x_m_ary * g0_ary_f[k] + pref1_x_m_ary
+                x_m_ary_f = a_ps/fluxfac * (pref0_x_m_ary * g0_ary_f[k] + pref1_x_m_ary
                             * g1_ary_f[k] + pref2_x_m_ary * g2_ary_f[k]) \
                             * npt_compressed[p]
                 x_m_ary[p,k] += df_rho_div_f2 * x_m_ary_f
@@ -177,9 +181,8 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
 @cython.wraparound(False)
 @cython.cdivision(True)
 @cython.initializedcheck(False)
-def return_xs_3break(double[::1] theta, double[::1] f_ary, 
-                     double[::1] df_rho_div_f_ary, double[::1] npt_compressed,
-                     int[::1] data):
+def return_xs_3break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary, 
+                     double[::1] ft_compressed, double[::1] npt_compressed, int[::1] data):
     """ Dedicated calculation of x_m and x_m_sum for 3 breaks 
     """
 
@@ -203,7 +206,7 @@ def return_xs_3break(double[::1] theta, double[::1] f_ary,
     cdef double[::1] g2_ary_f = np.zeros(k_max + 1)
     cdef double[::1] g3_ary_f = np.zeros(k_max + 1)
 
-    cdef double f2, df_rho_div_f2
+    cdef double f2, df_rho_div_f2, fluxfac
     cdef double pref0_x_m_ary, pref1_x_m_ary, pref2_x_m_ary, pref3_x_m_ary
     cdef double first0_x_m_sum_ary, first1_x_m_sum_ary, first2_x_m_sum_ary
     cdef double first3_x_m_sum_ary
@@ -227,20 +230,22 @@ def return_xs_3break(double[::1] theta, double[::1] f_ary,
         f2 = float(f_ary[f_index])
         df_rho_div_f2 = df_rho_div_f_ary[f_index]
 
-        g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * f2)
-        g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2) \
-                   - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * f2)
-        g2_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n3, sb3 * f2) \
-                   - igf.incgamma_up_fct_ary(k_max, 1. - n3, sb2 * f2)
-        g3_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n4, sb3 * f2)
-
-        pref0_x_m_ary = pow(sb1 * f2, n1)
-        pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * f2, n2 - n1)
-        pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * f2, n3 - n2)
-        pref3_x_m_ary = pref2_x_m_ary * pow(sb3 * f2, n4 - n3)
-
         for p in range(npix_roi):
-            x_m_sum_f = (a_ps * sb1 * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary
+            fluxfac = ft_compressed[p]
+
+            g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * fluxfac * f2)
+            g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * fluxfac * f2) \
+                       - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * fluxfac * f2)
+            g2_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n3, sb3 * fluxfac * f2) \
+                       - igf.incgamma_up_fct_ary(k_max, 1. - n3, sb2 * fluxfac * f2)
+            g3_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n4, sb3 * fluxfac * f2)
+
+            pref0_x_m_ary = pow(sb1 * f2, n1)
+            pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * fluxfac * f2, n2 - n1)
+            pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * fluxfac * f2, n3 - n2)
+            pref3_x_m_ary = pref2_x_m_ary * pow(sb3 * fluxfac * f2, n4 - n3)
+
+            x_m_sum_f = (a_ps/fluxfac * sb1 * fluxfac * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary
                         + first1_x_m_sum_ary*second1_x_m_sum_ary
                         + first2_x_m_sum_ary*second2_x_m_sum_ary
                         + first3_x_m_sum_ary*second3_x_m_sum_ary) \
@@ -248,7 +253,7 @@ def return_xs_3break(double[::1] theta, double[::1] f_ary,
             x_m_sum[p] += df_rho_div_f2 * x_m_sum_f
 
             for k in range(data[p]+1):
-                x_m_ary_f = a_ps * (pref0_x_m_ary*g0_ary_f[k]
+                x_m_ary_f = a_ps/fluxfac * (pref0_x_m_ary*g0_ary_f[k]
                             + pref1_x_m_ary*g1_ary_f[k]
                             + pref2_x_m_ary*g2_ary_f[k]
                             + pref3_x_m_ary*g3_ary_f[k]) \
@@ -347,7 +352,7 @@ def return_xs_lbreak(double[::1] theta, int n_break, double[::1] f_ary,
 
         dp_sum = 0.0
         for i in range(0, n_break+1):
-            dp_sum += first_x_m_sum_ary[i] *second_x_m_sum_ary[i]
+            dp_sum += first_x_m_sum_ary[i] * second_x_m_sum_ary[i]
 
         for p in range(npix_roi):
             x_m_sum_f = a_ps * sb_ary[0] * f2 * dp_sum * npt_compressed[p]

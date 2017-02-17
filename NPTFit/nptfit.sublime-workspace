@@ -1,0 +1,271 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"el",
+				"elif"
+			],
+			[
+				"conce",
+				"concentration_model"
+			],
+			[
+				"l",
+				"log"
+			],
+			[
+				"rho",
+				"rho_s"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 87.0,
+		"last_filter": "install pa",
+		"selected_items":
+		[
+			[
+				"install pa",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 485.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"install",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"install",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"install ",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+	],
+	"file_history":
+	[
+		"/Users/laurachang/NPTFit/NPTFit/npll.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/nptf_scan.py",
+		"/Users/laurachang/NPTFit/NPTFit/config_maps.py",
+		"/Users/laurachang/NPTFit/NPTFit/x_m.pyx",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/Fermi-Subhalos-NPTF.sublime-project",
+		"/Users/laurachang/NPTFit/NPTFit/nptfit.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Ein_1em25.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Ein_1em24.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subgen.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Blazar_2Breaks.py",
+		"/Users/laurachang/cosmosis-docker/cosmosis/cosmosis-standard-library/utility/consistency/consistency.py",
+		"/Users/laurachang/cosmosis-docker/cosmosis/cosmosis-standard-library/utility/consistency/consistency_interface.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Ein_iso_only.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/astrogen.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/particle.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/nfw.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/einasto.py",
+		"/Users/laurachang/cosmosis/cosmosis/datablock/generate_sections.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Einasto_2Breaks.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Runs_3FGL.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/units.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/sftp-config.json",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/Fermi-Subhalos-NPTF.sublime-workspace",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_noNFW.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_Blazar_2Breaks.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_withNFW.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_Blazars_Bright.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_Blazars_withNFW.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_Blazars_noNFW.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/sftp-config.json",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_Runs.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/astrogen.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_Runs_PS.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/notebooks/NPTF_Runs_PS.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/notebooks/NPTF_Runs.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/particle.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_Runs_1em25.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/notebooks/Make_Fake_Data_Diffuse_Only.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/notebooks/Make_Subhalo_Template.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/nfw.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/NPTF_Runs_1em25.py",
+		"/Users/laurachang/Desktop/Princeton/Feynman/From sid/sftp-config.json",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480955294/feynman/group/hepheno/smsharma/Fermi-Subhalos-NPTF/README.md",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480953839/feynman/group/hepheno/smsharma/Fermi-Subhalos-NPTF/notebooks/Make_Fake_Data.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Feynman/Sid's/sftp-config.json",
+		"/Users/laurachang/Desktop/Princeton/Feynman/Fermi_Subhalos_NPTF/sftp-config.json",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480952460/feynman/group/hepheno/smsharma/Fermi-Subhalos-NPTF/data/subhalo_flux_map_1em24.npy",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/Analyze_Results.ipynb",
+		"/private/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/nfw.py",
+		"/private/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/particle.py",
+		"/private/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/units.py",
+		"/private/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/subgen.py",
+		"/Users/laurachang/Library/Application Support/Sublime Text 3/Packages/User/sftp_servers/mydir",
+		"/Users/laurachang/Library/Application Support/Sublime Text 3/Packages/User/sftp_servers/feynman",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480903599/feynman/group/hepheno/ljchang/Basics/Basics.ipynb",
+		"/Users/laurachang/Downloads/Analyze_Results (1).ipynb",
+		"/Users/laurachang/Basics"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"fixed",
+			"\n        ",
+			"print",
+			"rho_c",
+			"alpha",
+			"r_s",
+			"scipy",
+			"host"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"folder"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.sftp":
+	{
+		"height": 144.0
+	},
+	"pinned_build_system": "Packages/Python/Python.sublime-build",
+	"project": "nptfit.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"subhalo_runs/NPTF_Ein_1em24.py"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 204.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
