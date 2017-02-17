@@ -93,7 +93,7 @@ class ConfigMaps(SetDirs):
         flux_map_label = "fm_" + label
         self.flux_maps_dict.update({flux_map_label: flux_map})
 
-    def load_flux_map(self, flux_map, label, units='counts'):
+    def load_flux_map(self, flux_map, label, meanone = True, units='counts'):
         """ Function to add a flux map to the flux map dictionary and array
 
             Note maps should be exposure corrected, so that they model
@@ -102,6 +102,7 @@ class ConfigMaps(SetDirs):
             :param flux_map: Input flux map
             :param label: String used to identify the template to which 
             the flux map is applied
+            :param meanone: Flux map has mean one (in counts). Default set to True
             :param units: Units of provided map. By default
             'counts': Map in photon counts
             'flux': Map in fluxes with units ph/cm^2/s
@@ -120,8 +121,10 @@ class ConfigMaps(SetDirs):
             "Must load a template before setting up the scan"
         assert (len(self.templates_dict[label]) != 0),\
             "Must provide template before adding a flux map to it"
-        flux_map = flux_map/np.mean(flux_map)
-        self.flux_maps_dict.update({label: flux_map})
+        if meanone == True:
+            flux_map = flux_map/np.mean(flux_map)
+        flux_map_label = "fm_" + label
+        self.flux_maps_dict.update({flux_map_label: flux_map})
         # Note: only nontrivial flux maps are added to self.flux_maps
         self.flux_maps.append(flux_map)
         # Update template with flux map
