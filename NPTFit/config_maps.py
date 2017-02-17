@@ -118,7 +118,7 @@ class ConfigMaps(SetDirs):
         assert (len(self.templates_dict[temp_label]) != 0),\
             "Must provide template before adding a flux map to it"
         flux_map = flux_map/np.mean(flux_map)
-        self.flux_maps_dict.update({[label,temp_label]: flux_map})
+        self.flux_maps_dict.update({(label,temp_label): flux_map})
         self.flux_maps.append(flux_map)
         print("Flux map " + label + " has mean", np.mean(flux_map), "counts, added to " + temp_label)
 
