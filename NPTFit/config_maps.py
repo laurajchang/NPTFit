@@ -111,7 +111,7 @@ class ConfigMaps(SetDirs):
             assert (len(self.exposure_map) == len(flux_map)), \
                 "Flux map must be the same shape as the exposure map"
             flux_map *= self.exposure_map
-        flux_map /= np.mean(flux_map)
+        flux_map = flux_map/np.mean(flux_map)
         print("Flux map has mean", np.mean(flux_map), "counts")
         self.flux_maps_dict.update({label: flux_map})
         self.flux_maps.append(flux_map)
