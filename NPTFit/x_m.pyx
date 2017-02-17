@@ -82,11 +82,12 @@ def return_xs_1break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_di
     for f_index in range(len(f_ary)):
         f2 = float(f_ary[f_index])
         df_rho_div_f2 = df_rho_div_f_ary[f_index]
+        g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2,  sb * f2)
 
         for p in range(npix_roi):
             fluxfac = ft_compressed[p]
-
-            g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2,  sb * fluxfac * f2)
+            if fluxfac != 1:
+                g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2,  sb * fluxfac * f2)
         
             pref1_x_m_ary =  pow(sb * fluxfac * f2, n1)
             pref2_x_m_ary = pow(sb * fluxfac * f2, n2)
@@ -148,14 +149,18 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_di
     for f_index in range(len(f_ary)):
         f2 = float(f_ary[f_index])
         df_rho_div_f2 = df_rho_div_f_ary[f_index]
+        g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * f2)
+        g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2) \
+                       - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * f2)
+        g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * f2)
 
         for p in range(npix_roi):
             fluxfac = ft_compressed[p]
-
-            g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * fluxfac * f2)
-            g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * fluxfac * f2) \
-                       - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * fluxfac * f2)
-            g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * fluxfac * f2)
+            if fluxfac != 1: 
+                g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * fluxfac * f2)
+                g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * fluxfac * f2) \
+                           - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * fluxfac * f2)
+                g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * fluxfac * f2)
 
             pref0_x_m_ary = pow(sb1 * fluxfac * f2, n1)
             pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * fluxfac * f2, n2 - n1)
@@ -229,18 +234,24 @@ def return_xs_3break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_di
     for f_index in range(len(f_ary)):
         f2 = float(f_ary[f_index])
         df_rho_div_f2 = df_rho_div_f_ary[f_index]
+        g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * f2)
+        g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2) \
+                   - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * f2)
+        g2_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n3, sb3 * f2) \
+                   - igf.incgamma_up_fct_ary(k_max, 1. - n3, sb2 * f2)
+        g3_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n4, sb3 * f2)
 
         for p in range(npix_roi):
             fluxfac = ft_compressed[p]
+            if fluxfac != 1:
+                g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * fluxfac * f2)
+                g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * fluxfac * f2) \
+                           - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * fluxfac * f2)
+                g2_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n3, sb3 * fluxfac * f2) \
+                           - igf.incgamma_up_fct_ary(k_max, 1. - n3, sb2 * fluxfac * f2)
+                g3_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n4, sb3 * fluxfac * f2)
 
-            g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * fluxfac * f2)
-            g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * fluxfac * f2) \
-                       - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * fluxfac * f2)
-            g2_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n3, sb3 * fluxfac * f2) \
-                       - igf.incgamma_up_fct_ary(k_max, 1. - n3, sb2 * fluxfac * f2)
-            g3_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n4, sb3 * fluxfac * f2)
-
-            pref0_x_m_ary = pow(sb1 * f2, n1)
+            pref0_x_m_ary = pow(sb1 * fluxfac * f2, n1)
             pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * fluxfac * f2, n2 - n1)
             pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * fluxfac * f2, n3 - n2)
             pref3_x_m_ary = pref2_x_m_ary * pow(sb3 * fluxfac * f2, n4 - n3)

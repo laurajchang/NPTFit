@@ -4,6 +4,42 @@
 		"selected_items":
 		[
 			[
+				"flux",
+				"flux_maps_dict"
+			],
+			[
+				"flux_",
+				"flux_maps"
+			],
+			[
+				"fl",
+				"flux_map"
+			],
+			[
+				"templ",
+				"templates_dict"
+			],
+			[
+				"tem",
+				"templates_dict"
+			],
+			[
+				"return",
+				"return_masked_compressed"
+			],
+			[
+				"masked",
+				"masked_array"
+			],
+			[
+				"c",
+				"compressed"
+			],
+			[
+				"flu",
+				"flux_template"
+			],
+			[
 				"el",
 				"elif"
 			],
@@ -23,6 +59,51 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "npll.pyx",
+			"settings":
+			{
+				"buffer_size": 4614,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "nptf_scan.py",
+			"settings":
+			{
+				"buffer_size": 30649,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "config_maps.py",
+			"settings":
+			{
+				"buffer_size": 11613,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "nptfit.py",
+			"settings":
+			{
+				"buffer_size": 1893,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "x_m.pyx",
+			"settings":
+			{
+				"buffer_size": 14798,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "",
 	"build_system_choices":
@@ -73,6 +154,10 @@
 	],
 	"file_history":
 	[
+		"/Users/laurachang/NPTFit/NPTFit/pll.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/psf_correction.py",
+		"/Users/laurachang/NPTFit/sftp-config.json",
+		"/Users/laurachang/NPTFit/NPTFit/dnds_analysis.py",
 		"/Users/laurachang/NPTFit/NPTFit/npll.pyx",
 		"/Users/laurachang/NPTFit/NPTFit/nptf_scan.py",
 		"/Users/laurachang/NPTFit/NPTFit/config_maps.py",
@@ -133,7 +218,7 @@
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -147,6 +232,37 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"self.ft_compressed_exp_ary",
+			"self.ft_dist_compressed_exp_ary",
+			"self.ft",
+			"self.flux",
+			"self.NPT_dist_",
+			"self.templates_dict_",
+			"self.npt",
+			"npll",
+			"self.templates_dict_nested",
+			"flux_maps",
+			"pll",
+			"x_m",
+			"npll",
+			"templates_dict_nested",
+			"compress",
+			"for i in range",
+			"self.templates",
+			"n_break",
+			"print",
+			"npll",
+			"templates_dict_nested",
+			"compressed",
+			"templates_dict",
+			"data",
+			"flux",
+			"f_ary",
+			"print",
+			"flux_template",
+			"f_ary",
+			"npll",
+			"f_ary",
 			"fixed",
 			"\n        ",
 			"print",
@@ -173,8 +289,174 @@
 	"groups":
 	[
 		{
+			"selected": 4,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "npll.pyx",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4614,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2386,
+								2386
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Cython/Cython.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 814.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "nptf_scan.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 30649,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								20965,
+								20965
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4549.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "config_maps.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11613,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8277,
+								8283
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3242.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "nptfit.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1893,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								455,
+								455
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 112.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "x_m.pyx",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14798,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7712,
+								7712
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Cython/Cython.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 179.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
 			]
 		}
 	],

@@ -41,7 +41,7 @@ class ConfigMaps(SetDirs):
         self.templates_dict = {}
 
         # Initialise flux map dictionary and array
-        self.flux_maps = []
+        # self.flux_maps = []
         self.flux_maps_dict = {}
 
     def load_data(self, count_map, exposure_map):
@@ -53,7 +53,7 @@ class ConfigMaps(SetDirs):
 
         self.count_map = count_map
         self.exposure_map = exposure_map
-
+l
     def load_mask(self, external_mask):
         """ Function to input analysis mask
 
@@ -126,11 +126,12 @@ class ConfigMaps(SetDirs):
         flux_map_label = "fm_" + label
         self.flux_maps_dict.update({flux_map_label: flux_map})
         # Note: only nontrivial flux maps are added to self.flux_maps
-        self.flux_maps.append(flux_map)
+        # self.flux_maps.append(flux_map)
+        
         # Update template with flux map
-        temp = flux_map*self.templates_dict[label]
-        self.templates_dict.update({label: temp})
-        print("Flux map has mean", np.mean(flux_map), "counts, added to " + label)
+        # temp = flux_map*self.templates_dict[label]
+        # self.templates_dict.update({label: temp})
+        print("Flux map has mean", np.mean(flux_map), "counts, to be added to " + label)
 
     def compress_data_and_templates(self):
         """ Compress data, exposure and templates
@@ -147,11 +148,6 @@ class ConfigMaps(SetDirs):
         # Number of pixels is fixed to be the length of the count_map
         self.npix = len(self.count_map)
 
-        # If no flux map inserted, set to uniform unit flux map
-        if len(self.flux_map) == 0:
-            print("No flux map set; defaulting to uniform flux map")
-            self.flux_map = np.ones(self.npix, dtype='float64')
-
         # If no mask inserted, set to blank mask
         if len(self.mask_total) == 0:
             print("No mask set; defaulting to a blank mask")
@@ -160,13 +156,14 @@ class ConfigMaps(SetDirs):
         # Check all inputs have the same length
         assert(len(self.exposure_map) == self.npix), \
             "Exposure map is a different shape to the data"
-        assert(len(self.flux_map) == self.npix), \
-            "Flux map has a different shape to the data"
         assert(len(self.mask_total) == self.npix), \
             "Mask has a different shape to the data"
         for key in self.templates_dict.keys():
             assert(len(self.templates_dict[key]) == self.npix), \
                 key + " has a different shape to the data"
+        for key in self.flux_maps_dict.keys():
+            assert(len(self.flux_maps_dict[key]) == self.npix), \
+                key + " has a different shape to the data" 
 
         # Compress data - this is used for a Poissonian scan
         temp_data = ma.masked_array(data=self.count_map, mask=self.mask_total)
@@ -190,18 +187,17 @@ class ConfigMaps(SetDirs):
             self.masked_compressed_data_expreg.append(np.array(
                  temp_data_expreg.compressed(), dtype='int32'))
 
-        # Create a nested dictionary of different versions of the templates
+        # Create a nested dictionary of different versions of the flux maps
         the_flux_dict = self.flux_maps_dict
         flux_keys = self.flux_maps_dict.keys()
-
-        self.templates_dict_nested = {
-            key: {'template':
-                  the_dict[key],
-                  'template_masked_compressed':
-                  self.return_masked_compressed(the_dict[key]),
-                  'template_masked_compressed_expreg':
-                  self.return_masked_compressed(the_dict[key], expreg=True)}
-            for key in keys}
+        self.flux_maps_dict_nested = {
+            key: {'flux_map':
+                  the_flux_dict[key],
+                  'flux_map_masked_compressed':
+                  self.return_masked_compressed(the_flux_dict[key]),
+                  'flux_map_masked_compressed_expreg':
+                  self.return_masked_compressed(the_flux_dict[key], expreg=True)}
+            for key in flux_keys}
 
         # Create a nested dictionary of different versions of the templates
         the_dict = self.templates_dict

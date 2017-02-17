@@ -41,7 +41,7 @@ def log_like(pt_sum_compressed, theta, f_ary, df_rho_div_f_ary, ft_compressed, n
                the form: [A, n[1], .., n[j+1], Sb[1], .., Sb[j]]
         f_ary: Photon leakage probabilities characterizing PSF, sum(f_ary) = 1.0
         df_rho_div_f_ary: df*rho(f)/f for integrating over f as a sum
-        ft_compressed: Pixel-wise flux template
+        ft_compressed: Array of compressed flux templates
         npt_compressed: Array of non-poissonian templates. Length of array is
                         the number of PS templates, and each element in the
                         array is the pixel-wise normalization of the PS template
@@ -65,7 +65,7 @@ def log_like(pt_sum_compressed, theta, f_ary, df_rho_div_f_ary, ft_compressed, n
         # Check theta has the correct length
         assert(len(theta[i]) % 2 == 0), "theta has an invalid length!"
 
-        x_m_ary_out, x_m_sum_out = x_m.return_xs(np.array(theta[i]), f_ary, df_rho_div_f_ary, ft_compressed, 
+        x_m_ary_out, x_m_sum_out = x_m.return_xs(np.array(theta[i]), f_ary, df_rho_div_f_ary, ft_compressed[i], 
                                        npt_compressed[i], data)
         x_m_ary += np.asarray(x_m_ary_out)
         x_m_sum += np.asarray(x_m_sum_out)
