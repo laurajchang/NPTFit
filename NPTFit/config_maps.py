@@ -88,7 +88,7 @@ class ConfigMaps(SetDirs):
         self.templates_dict.update({label: template})
         self.templates.append(template)
 
-    def load_flux_map(self, flux_map, label, units='counts'):
+    def load_flux_map(self, flux_map, label, temp_label, units='counts'):
         """ Function to add a flux map to the flux map dictionary and array
 
             Note maps should be exposure corrected, so that they model
@@ -97,6 +97,8 @@ class ConfigMaps(SetDirs):
             :param flux_map: Input flux map
             :param label: String used to identify the flux map in
             subsequent calls
+            :param temp_label: String used to identify the template to which 
+            the flux map is applied
             :param units: Units of provided map. By default
             'counts': Map in photon counts
             'flux': Map in fluxes with units ph/cm^2/s
@@ -111,9 +113,11 @@ class ConfigMaps(SetDirs):
             assert (len(self.exposure_map) == len(flux_map)), \
                 "Flux map must be the same shape as the exposure map"
             flux_map *= self.exposure_map
+        assert (len(self.templates_dict[temp_label]) != 0),\
+            "Must provide template before adding a flux map to it"
         flux_map = flux_map/np.mean(flux_map)
         print("Flux map has mean", np.mean(flux_map), "counts")
-        self.flux_maps_dict.update({label: flux_map})
+        self.flux_maps_dict.update({[label,temp_label]: flux_map})
         self.flux_maps.append(flux_map)
 
     def compress_data_and_templates(self):
