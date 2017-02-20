@@ -53,7 +53,7 @@ class ConfigMaps(SetDirs):
 
         self.count_map = count_map
         self.exposure_map = exposure_map
-l
+
     def load_mask(self, external_mask):
         """ Function to input analysis mask
 
