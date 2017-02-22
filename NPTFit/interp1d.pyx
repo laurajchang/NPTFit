@@ -40,14 +40,14 @@ def interp1d(np.ndarray[DTYPEf_t, ndim=1] x, np.ndarray[DTYPEf_t, ndim=1] y,
     """
     cdef int nx = x.shape[0]
     cdef int ny = y.shape[0]
+    cdef int nx_new = new_x.shape[0]
 
     assert (nx == ny), \
         "x and y must have equal length!"
     cdef int i, j
-    cdef np.ndarray[DTYPEf_t, ndim=1] new_y = np.zeros(nx, dtype=DTYPEf)
+    cdef np.ndarray[DTYPEf_t, ndim=1] new_y = np.zeros(nx_new, dtype=DTYPEf)
 
-    for i in range(nx):
-    # Loop through x_new
+    for i in range(nx_new):
         if x[0] >= new_x[i]:
             new_y[i] = y[0]
             print("Certain values in new_x too small!")
@@ -56,7 +56,6 @@ def interp1d(np.ndarray[DTYPEf_t, ndim=1] x, np.ndarray[DTYPEf_t, ndim=1] y,
             print("Certain values in new_x too large!")
         else:
             for j in range(1, nx):
-            # Loop through x
                 if x[j] > new_x[i]:
                  new_y[i] = (y[j] - y[j-1]) / (x[j] - x[j-1]) * (new_x[i] - x[j-1]) + y[j-1]
                  break
