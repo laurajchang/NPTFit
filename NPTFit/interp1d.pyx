@@ -14,9 +14,9 @@ cimport cython
 DTYPEf = np.float64
 ctypedef np.float64_t DTYPEf_t
 
-@cython.boundscheck(False) # turn off bounds-checking for entire function
-@cython.wraparound(False)  # turn off bounds-checking for entire function
-cpdef interp1d(np.ndarray[DTYPEf_t, ndim=1] x, np.ndarray[DTYPEf_t, ndim=1] y,
+# @cython.boundscheck(False) # turn off bounds-checking for entire function
+# @cython.wraparound(False)  # turn off bounds-checking for entire function
+def interp1d(np.ndarray[DTYPEf_t, ndim=1] x, np.ndarray[DTYPEf_t, ndim=1] y,
                np.ndarray[DTYPEf_t, ndim=1] new_x):
     """
     interp1d(x, y, new_x)
