@@ -11,6 +11,7 @@ import numpy as np
 cimport numpy as np
 cimport cython
 import incgamma_fct as igf
+import interp1d
 
 # Type used for all non-integer functions
 DTYPE = np.float
@@ -83,7 +84,7 @@ def return_xs_1break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_di
     cdef double[::1,:] g1_ref_mat = np.zeros((k_max + 1, len(sb_ref_ary)), dtype=DTYPE)
     cdef double[::1,:] g2_ref_mat = np.zeros((k_max + 1, len(sb_ref_ary)), dtype=DTYPE)
 
-    cdef double[::1] kmax_ary = np.zeros(npix_roi)
+    cdef double[::1] k_max_ary = np.zeros(npix_roi)
     cdef double[::1] ffac_ary = np.zeros(npix_roi)
     cdef double[::1,:] g1_mat_f = np.zeros((k_max + 1, npix_roi), dtype=DTYPE)
     cdef double[::1,:] g2_mat_f = np.zeros((k_max + 1, npix_roi), dtype=DTYPE)
@@ -97,14 +98,14 @@ def return_xs_1break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_di
         # For the case of a nontrivial flux template, generate matrix of incomplete gamma function values
         # to interpolate about, and interpolate appropriately for each pixel
         if len(ft_compressed) != 0:
-            g1_ref_mat = np.column_stack([igf.incgamma_lo_fct_ary(kmax, 1. - n1, float(f * sb * f2)) for f in sb_ref_ary])
-            g2_ref_mat = np.column_stack([igf.incgamma_lo_fct_ary(kmax, 1. - n2, float(f * sb * f2)) for f in sb_ref_ary])
+            g1_ref_mat = np.column_stack([igf.incgamma_lo_fct_ary(k_max, 1. - n1, float(f * sb * f2)) for f in sb_ref_ary])
+            g2_ref_mat = np.column_stack([igf.incgamma_lo_fct_ary(k_max, 1. - n2, float(f * sb * f2)) for f in sb_ref_ary])
 
-            kmax_ary = [data[p]+1 for p in range(data)]
+            k_max_ary = [data[p]+1 for p in range(len(data))]
 
-            for k in range(kmax):
+            for k in range(k_max):
                 for p in range(npix_roi):
-                    if k < kmax_ary[p]:
+                    if k < k_max_ary[p]:
                         ffac_ary[p] = ft_compressed[p]
                     else:
                         ffac_ary[p] = 0
