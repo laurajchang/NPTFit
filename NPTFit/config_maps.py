@@ -89,7 +89,7 @@ class ConfigMaps(SetDirs):
         self.templates_dict.update({label: template})
         self.templates.append(template)
         # Add default flux maps
-        flux_map = []
+        flux_map = np.array([])
         flux_map_label = "fm_" + label
         self.flux_maps_dict.update({flux_map_label: flux_map})
 
@@ -156,9 +156,9 @@ class ConfigMaps(SetDirs):
         for key in self.templates_dict.keys():
             assert(len(self.templates_dict[key]) == self.npix), \
                 key + " has a different shape to the data"
-        for key in self.flux_maps_dict.keys():
-            assert(len(self.flux_maps_dict[key]) == self.npix), \
-                key + " has a different shape to the data" 
+        # for key in self.flux_maps_dict.keys():
+        #     assert(len(self.flux_maps_dict[key]) == self.npix), \
+        #         key + " has a different shape to the data" 
 
         # Compress data - this is used for a Poissonian scan
         temp_data = ma.masked_array(data=self.count_map, mask=self.mask_total)
@@ -190,8 +190,8 @@ class ConfigMaps(SetDirs):
             if len(the_flux_dict[key]) == 0:
                 self.flux_maps_dict_nested.update({key: {'template': 
                                                         the_flux_dict[key],
-                                                        'template_masked_compressed':[],
-                                                        'template_masked_compressed_expreg':[]}})
+                                                        'template_masked_compressed':np.array([]),
+                                                        'template_masked_compressed_expreg':np.array([])}})
             else:
                 self.flux_maps_dict_nested.update({key: {'flux_map':
                                                         the_flux_dict[key],
