@@ -112,6 +112,8 @@ class NPTFScan(ConfigMaps):
             "units can only be counts or flux"
 
         # Add template to non_poiss_models dictionary
+        # With tag to indicate whether a flux template has been applied to 
+        # a given non_poiss template. Default set to False.
         self.non_poiss_models[template_name] = {'prior_range': prior_range,
                                                 'log_prior': log_prior_list,
                                                 'model_tag': model_tag,

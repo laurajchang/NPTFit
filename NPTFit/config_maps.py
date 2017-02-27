@@ -77,7 +77,7 @@ class ConfigMaps(SetDirs):
 
             .. note:: The exposure must be provided prior to adding a flux
             template. This is then multiplied by the exposure.
-            .. note:: By default, adding a template adds a unit flux map. 
+            .. note:: By default, adding a template adds an empty flux map. 
         """
 
         if units == 'flux':
@@ -88,8 +88,8 @@ class ConfigMaps(SetDirs):
             template *= self.exposure_map
         self.templates_dict.update({label: template})
         self.templates.append(template)
-        # Add unit flux maps
-        flux_map = np.ones(len(template))
+        # Add default flux maps
+        flux_map = []
         flux_map_label = "fm_" + label
         self.flux_maps_dict.update({flux_map_label: flux_map})
 
@@ -101,7 +101,7 @@ class ConfigMaps(SetDirs):
 
             :param flux_map: Input flux map
             :param label: String used to identify the template to which 
-            the flux map is applied
+            the flux map is applied. Note: this must match an applied NPT template.
             :param meanone: Flux map has mean one (in counts). Default set to True
             :param units: Units of provided map. By default
             'counts': Map in photon counts
@@ -125,12 +125,7 @@ class ConfigMaps(SetDirs):
             flux_map = flux_map/np.mean(flux_map)
         flux_map_label = "fm_" + label
         self.flux_maps_dict.update({flux_map_label: flux_map})
-        # Note: only nontrivial flux maps are added to self.flux_maps
-        # self.flux_maps.append(flux_map)
-        
-        # Update template with flux map
-        # temp = flux_map*self.templates_dict[label]
-        # self.templates_dict.update({label: temp})
+
         print("Flux map has mean", np.mean(flux_map), "counts, to be added to " + label)
 
     def compress_data_and_templates(self):
@@ -190,14 +185,20 @@ class ConfigMaps(SetDirs):
         # Create a nested dictionary of different versions of the flux maps
         the_flux_dict = self.flux_maps_dict
         flux_keys = self.flux_maps_dict.keys()
-        self.flux_maps_dict_nested = {
-            key: {'flux_map':
-                  the_flux_dict[key],
-                  'flux_map_masked_compressed':
-                  self.return_masked_compressed(the_flux_dict[key]),
-                  'flux_map_masked_compressed_expreg':
-                  self.return_masked_compressed(the_flux_dict[key], expreg=True)}
-            for key in flux_keys}
+        self.flux_maps_dict_nested = {}
+        for key in flux_keys:
+            if len(the_flux_dict[key]) == 0:
+                self.flux_maps_dict_nested.update({key: {'template': 
+                                                        the_flux_dict[key],
+                                                        'template_masked_compressed':[],
+                                                        'template_masked_compressed_expreg':[]}})
+            else:
+                self.flux_maps_dict_nested.update({key: {'flux_map':
+                                                        the_flux_dict[key],
+                                                        'flux_map_masked_compressed':
+                                                        self.return_masked_compressed(the_flux_dict[key]),
+                                                        'flux_map_masked_compressed_expreg':
+                                                        self.return_masked_compressed(the_flux_dict[key], expreg=True)}})
 
         # Create a nested dictionary of different versions of the templates
         the_dict = self.templates_dict

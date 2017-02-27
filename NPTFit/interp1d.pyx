@@ -14,8 +14,8 @@ cimport cython
 DTYPEf = np.float64
 ctypedef np.float64_t DTYPEf_t
 
-# @cython.boundscheck(False) # turn off bounds-checking for entire function
-# @cython.wraparound(False)  # turn off bounds-checking for entire function
+@cython.boundscheck(False) # turn off bounds-checking for entire function
+@cython.wraparound(False)  # turn off bounds-checking for entire function
 def interp1d(np.ndarray[DTYPEf_t, ndim=1] x, np.ndarray[DTYPEf_t, ndim=1] y,
                np.ndarray[DTYPEf_t, ndim=1] new_x):
     """
@@ -50,10 +50,10 @@ def interp1d(np.ndarray[DTYPEf_t, ndim=1] x, np.ndarray[DTYPEf_t, ndim=1] y,
     for i in range(nx_new):
         if x[0] >= new_x[i]:
             new_y[i] = y[0]
-            print("Certain values in new_x too small!")
+            print("Certain values in new_x too small!", i, new_x[i])
         elif x[nx-1] <= new_x[i]:
             new_y[i] = y[nx-1]
-            print("Certain values in new_x too large!")
+            print("Certain values in new_x too large!", i, new_x[i])
         else:
             for j in range(1, nx):
                 if x[j] > new_x[i]:
@@ -61,6 +61,8 @@ def interp1d(np.ndarray[DTYPEf_t, ndim=1] x, np.ndarray[DTYPEf_t, ndim=1] y,
                  break
     return new_y
 
+@cython.boundscheck(False) # turn off bounds-checking for entire function
+@cython.wraparound(False)  # turn off bounds-checking for entire function
 def loginterp1d(np.ndarray[DTYPEf_t, ndim=1] x, np.ndarray[DTYPEf_t, ndim=1] y,
                np.ndarray[DTYPEf_t, ndim=1] new_x):
     """

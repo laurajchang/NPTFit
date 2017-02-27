@@ -79,25 +79,62 @@ def return_xs_1break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_di
 
     cdef Py_ssize_t f_index, p, k
 
+    cdef double[::1] sb_ref_ary = np.logspace(-1,1,11)
+    cdef double[::1,:] g1_ref_mat = np.zeros((k_max + 1, len(sb_ref_ary)), dtype=DTYPE)
+    cdef double[::1,:] g2_ref_mat = np.zeros((k_max + 1, len(sb_ref_ary)), dtype=DTYPE)
+
+    cdef double[::1] kmax_ary = np.zeros(npix_roi)
+    cdef double[::1] ffac_ary = np.zeros(npix_roi)
+    cdef double[::1,:] g1_mat_f = np.zeros((k_max + 1, npix_roi), dtype=DTYPE)
+    cdef double[::1,:] g2_mat_f = np.zeros((k_max + 1, npix_roi), dtype=DTYPE)
+
+
+
     for f_index in range(len(f_ary)):
         f2 = float(f_ary[f_index])
         df_rho_div_f2 = df_rho_div_f_ary[f_index]
-        g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2,  sb * f2)
+
+        # For the case of a nontrivial flux template, generate matrix of incomplete gamma function values
+        # to interpolate about, and interpolate appropriately for each pixel
+        if len(ft_compressed) != 0:
+            g1_ref_mat = np.column_stack([igf.incgamma_lo_fct_ary(kmax, 1. - n1, float(f * sb * f2)) for f in sb_ref_ary])
+            g2_ref_mat = np.column_stack([igf.incgamma_lo_fct_ary(kmax, 1. - n2, float(f * sb * f2)) for f in sb_ref_ary])
+
+            kmax_ary = [data[p]+1 for p in range(data)]
+
+            for k in range(kmax):
+                for p in range(npix_roi):
+                    if k < kmax_ary[p]:
+                        ffac_ary[p] = ft_compressed[p]
+                    else:
+                        ffac_ary[p] = 0
+                g1_mat_f[k] = interp1d(sb_ref_ary, g1_ref_mat[k], [f * sb * f2 for f in ffac_ary])
+        
+        else:
+            g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb * f2)
+            g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2, sb * f2)
 
         for p in range(npix_roi):
-            fluxfac = ft_compressed[p]
-            if fluxfac != 1:
-                g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2,  sb * fluxfac * f2)
-        
-            pref1_x_m_ary =  pow(sb * fluxfac * f2, n1)
-            pref2_x_m_ary = pow(sb * fluxfac * f2, n2)
+            if len(ft_compressed) != 0:
+                fluxfac = ft_compressed[p]
+                a_ps = 1/fluxfac * float(theta[0])
+                sb = fluxfac * float(theta[3])
 
-            x_m_sum_f = a_ps/fluxfac*sb*fluxfac*f2*(1/(n1-1)+1/(1-n2)) * npt_compressed[p]
+            pref1_x_m_ary =  pow(sb * f2, n1)
+            pref2_x_m_ary = pow(sb * f2, n2)
+
+            x_m_sum_f = a_ps*sb*f2*(1/(n1-1)+1/(1-n2)) * npt_compressed[p]
             x_m_sum[p] += df_rho_div_f2*x_m_sum_f
 
             for k in range(data[p]+1):
-                x_m_ary_f = a_ps/fluxfac * (pref1_x_m_ary*g1_ary_f[k]
-                            + pref2_x_m_ary*g2_ary_f[k]) * npt_compressed[p]
+                if len(ft_compressed) != 0:
+                    g1 = g1_mat_f[k,p]
+                    g2 = g2_mat_f[k,p]
+                else:
+                    g1 = g1_ary_f[k]
+                    g2 = g2_ary_f[k]
+
+                x_m_ary_f = a_ps * (pref1_x_m_ary*g1 + pref2_x_m_ary*g2) * npt_compressed[p]
                 x_m_ary[p,k] += df_rho_div_f2*x_m_ary_f
             
     x_m_sum = np.asarray(x_m_sum) - np.asarray(x_m_ary)[:,0] 
