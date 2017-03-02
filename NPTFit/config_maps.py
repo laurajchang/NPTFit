@@ -190,8 +190,8 @@ class ConfigMaps(SetDirs):
             if len(the_flux_dict[key]) == 0:
                 self.flux_maps_dict_nested.update({key: {'flux_map': 
                                                         the_flux_dict[key],
-                                                        'flux_map_masked_compressed':np.array([]),
-                                                        'flux_map_masked_compressed_expreg':np.array([])}})
+                                                        'flux_map_masked_compressed':[np.array([])],
+                                                        'flux_map_masked_compressed_expreg':[np.array([])]}})
             else:
                 self.flux_maps_dict_nested.update({key: {'flux_map':
                                                         the_flux_dict[key],
