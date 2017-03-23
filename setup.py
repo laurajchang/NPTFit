@@ -16,6 +16,8 @@ extensions = [
         include_dirs=[numpy.get_include()], libraries=["gsl", "gslcblas", "m"],
         extra_compile_args=["-ffast-math",'-O3']),
     Extension("NPTFit.interp1d", ["NPTFit/interp1d.pyx"],
+        include_dirs=[numpy.get_include()], extra_compile_args=["-ffast-math",'-O3']),
+    Extension("NPTFit.findmin", ["NPTFit/findmin.pyx"],
         include_dirs=[numpy.get_include()], extra_compile_args=["-ffast-math",'-O3'])
 ]
 

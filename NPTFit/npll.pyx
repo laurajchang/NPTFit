@@ -1,15 +1,7 @@
 ###############################################################################
-# npll.pyx
+# interp1d.pyx
 ###############################################################################
 #
-# Calculation of non-poissonian contribution to Log Likelihood, which is then
-# combined with the poissonian contribution using the method of generating
-# functions.
-#
-# Calculation broken into two parts:
-#  1. Determination of x_m and x_m_sum, which depends on the number of 
-#     non-poissonian templates & the number of breaks each one has; and
-#  2. Determination of LL in terms of these using a recurrence relation
 #
 ###############################################################################
 
@@ -70,6 +62,7 @@ def log_like(pt_sum_compressed, theta, f_ary, df_rho_div_f_ary, ft_compressed, n
         x_m_ary += np.asarray(x_m_ary_out)
         x_m_sum += np.asarray(x_m_sum_out)
 
+        # print("params=",theta[i])
     return log_like_internal(pt_sum_compressed, data, x_m_ary, x_m_sum, k_max,
                              npixROI)
 
@@ -123,5 +116,5 @@ cdef double log_like_internal(double[::1] pt_sum_compressed, int[::1] data,
             ll += log(pk[data[p]])
         else:
             ll += -10.1**10.
-
+    # print("ll=", ll)
     return ll

@@ -25,6 +25,7 @@ from . import pll  # The Poissonian likelihood function
 from . import npll  # The non-Poissonian likelihood function
 from .config_maps import ConfigMaps  # Setup maps and templates for the run
 
+import timeit
 
 class NPTFScan(ConfigMaps):
     def __init__(self, tag='Untagged', work_dir=None):
@@ -420,7 +421,6 @@ class NPTFScan(ConfigMaps):
         """ Pass all details to the likelihood evaluator, and define the total
             ll to be the sum of that in each of the exposure regions
         """
-
         ll = 0.0
         for i in range(self.nexp):
             # For each NPT template adjust the breaks to account for the

@@ -4,8 +4,116 @@
 		"selected_items":
 		[
 			[
+				"log",
+				"log10"
+			],
+			[
+				"sb_ef",
+				"sb_eff_ary"
+			],
+			[
+				"sb_eff",
+				"sb_eff_mat"
+			],
+			[
+				"g2_r",
+				"g2_ref_mat"
+			],
+			[
+				"x_m_",
+				"x_m_sum_f"
+			],
+			[
+				"inc_",
+				"incgamma_fct_p"
+			],
+			[
+				"g2_ref",
+				"g2_ref_ary"
+			],
+			[
+				"g1_ref",
+				"g1_ref_mat"
+			],
+			[
+				"k_m",
+				"k_max_ary"
+			],
+			[
+				"dou",
+				"double_array_template"
+			],
+			[
+				"new",
+				"new_x"
+			],
+			[
+				"k",
+				"k"
+			],
+			[
+				"g1_re",
+				"g1_ref_ary"
+			],
+			[
+				"g1_r",
+				"g1_ref_ary"
+			],
+			[
+				"g2_",
+				"g2_ary_f"
+			],
+			[
+				"g2",
+				"g2_ref_mat"
+			],
+			[
+				"g",
+				"g1_ref_mat"
+			],
+			[
+				"g1_",
+				"g1_mat_f"
+			],
+			[
+				"g1",
+				"g1_mat_f"
+			],
+			[
+				"DTE",
+				"DTYPEf_t"
+			],
+			[
+				"x",
+				"x"
+			],
+			[
+				"interp",
+				"interp1d"
+			],
+			[
+				"kmax",
+				"kmax_ary"
+			],
+			[
+				"np",
+				"npix_roi"
+			],
+			[
+				"g2_ar",
+				"g2_ary_k"
+			],
+			[
+				"incg",
+				"incgamma_lo_fct_ary"
+			],
+			[
+				"templ",
+				"template_masked_compressed_expreg"
+			],
+			[
 				"flux",
-				"flux_maps_dict"
+				"flux_maps_dict_nested"
 			],
 			[
 				"flux_",
@@ -14,10 +122,6 @@
 			[
 				"fl",
 				"flux_map"
-			],
-			[
-				"templ",
-				"templates_dict"
 			],
 			[
 				"tem",
@@ -63,7 +167,7 @@
 			"file": "npll.pyx",
 			"settings":
 			{
-				"buffer_size": 4614,
+				"buffer_size": 4670,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -72,7 +176,7 @@
 			"file": "nptf_scan.py",
 			"settings":
 			{
-				"buffer_size": 30649,
+				"buffer_size": 30779,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -81,7 +185,26 @@
 			"file": "config_maps.py",
 			"settings":
 			{
-				"buffer_size": 11613,
+				"buffer_size": 12044,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "interp1d.pyx",
+			"settings":
+			{
+				"buffer_size": 7897,
+				"encoding": "UTF-8",
+				"line_ending": "Unix",
+				"name": "import numpy as N"
+			}
+		},
+		{
+			"file": "x_m.pyx",
+			"settings":
+			{
+				"buffer_size": 20581,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -96,11 +219,10 @@
 			}
 		},
 		{
-			"file": "x_m.pyx",
+			"file": "incgamma_fct.pyx",
 			"settings":
 			{
-				"buffer_size": 14798,
-				"encoding": "UTF-8",
+				"buffer_size": 1584,
 				"line_ending": "Unix"
 			}
 		}
@@ -151,12 +273,24 @@
 	},
 	"expanded_folders":
 	[
+		"/Users/laurachang/NPTFit",
+		"/Users/laurachang/NPTFit/NPTFit"
 	],
 	"file_history":
 	[
-		"/Users/laurachang/NPTFit/NPTFit/pll.pyx",
-		"/Users/laurachang/NPTFit/NPTFit/psf_correction.py",
+		"/Users/laurachang/NPTFit/NPTFit/incgamma_fct.c",
+		"/Users/laurachang/NPTFit/setup.py",
 		"/Users/laurachang/NPTFit/sftp-config.json",
+		"/Users/laurachang/NPTFit/NPTFit/incgamma_fct_p.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/incgamma_fct.h",
+		"/Users/laurachang/Library/Application Support/Sublime Text 3/Packages/User/SFTP.errors.log",
+		"/Users/laurachang/NPTFit/NPTFit/x_m.html",
+		"/Users/laurachang/NPTFit/NPTFit/incgamma_fct.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/pll.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/__init__.py",
+		"/Users/laurachang/NPTFit/NPTFit/x_m.c",
+		"/Users/laurachang/NPTFit/NPTFit/npll.c",
+		"/Users/laurachang/NPTFit/NPTFit/psf_correction.py",
 		"/Users/laurachang/NPTFit/NPTFit/dnds_analysis.py",
 		"/Users/laurachang/NPTFit/NPTFit/npll.pyx",
 		"/Users/laurachang/NPTFit/NPTFit/nptf_scan.py",
@@ -232,6 +366,39 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"nexp",
+			"npll",
+			"log_like",
+			"nbreak_ary",
+			"theta_ps_ary",
+			"theta",
+			"PT_sum_compressed",
+			"npll",
+			"theta_ps_ary",
+			"theta_ps",
+			"make_ll",
+			"make_pt_sum_theta",
+			"theta",
+			"internal",
+			"theta",
+			"self.masked_compressed_data",
+			"npix",
+			"interp1d",
+			"k_max_ary",
+			"ndarray",
+			"ft_compres",
+			"ft_com",
+			"ones",
+			"flux_maps",
+			"kmax",
+			"sb_ary",
+			"self.ft_compressed_exp_ary",
+			"npll",
+			"k_max",
+			"f_ary",
+			"assert",
+			"ft_compressed",
+			"compressed_flux_map",
 			"self.ft_compressed_exp_ary",
 			"self.ft_dist_compressed_exp_ary",
 			"self.ft",
@@ -298,31 +465,31 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4614,
+						"buffer_size": 4670,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2386,
-								2386
+								4591,
+								4591
 							]
 						],
 						"settings":
 						{
 							"incomplete_sync": null,
 							"remote_loading": false,
-							"synced": false,
+							"synced": true,
 							"syntax": "Packages/Cython/Cython.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 814.0,
+						"translation.y": 1458.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -331,31 +498,31 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 30649,
+						"buffer_size": 30779,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								20965,
-								20965
+								20780,
+								20782
 							]
 						],
 						"settings":
 						{
 							"incomplete_sync": null,
 							"remote_loading": false,
-							"synced": false,
+							"synced": true,
 							"syntax": "Packages/Python/Python.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4549.0,
+						"translation.y": 1809.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -364,35 +531,102 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11613,
+						"buffer_size": 12044,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8277,
-								8283
+								7608,
+								7611
 							]
 						],
 						"settings":
 						{
 							"incomplete_sync": null,
 							"remote_loading": false,
-							"synced": false,
+							"synced": true,
 							"syntax": "Packages/Python/Python.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3242.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
+					"file": "interp1d.pyx",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7897,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6124,
+								6124
+							]
+						],
+						"settings":
+						{
+							"auto_name": "import numpy as N",
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": true,
+							"syntax": "Packages/Cython/Cython.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3302.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "x_m.pyx",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 20581,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5571,
+								5571
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": true,
+							"syntax": "Packages/Cython/Cython.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 607.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
 					"file": "nptfit.py",
 					"semi_transient": false,
 					"settings":
@@ -404,57 +638,57 @@
 						"selection":
 						[
 							[
-								455,
-								455
+								834,
+								834
 							]
 						],
 						"settings":
 						{
 							"incomplete_sync": null,
 							"remote_loading": false,
-							"synced": false,
+							"synced": true,
 							"syntax": "Packages/Python/Python.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 112.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "x_m.pyx",
+					"buffer": 6,
+					"file": "incgamma_fct.pyx",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14798,
+						"buffer_size": 1584,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7712,
-								7712
+								718,
+								718
 							]
 						],
 						"settings":
 						{
 							"incomplete_sync": null,
 							"remote_loading": false,
-							"synced": false,
+							"synced": true,
 							"syntax": "Packages/Cython/Cython.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 179.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
