@@ -25,7 +25,6 @@ from . import pll  # The Poissonian likelihood function
 from . import npll  # The non-Poissonian likelihood function
 from .config_maps import ConfigMaps  # Setup maps and templates for the run
 
-import timeit
 
 class NPTFScan(ConfigMaps):
     def __init__(self, tag='Untagged', work_dir=None):
@@ -113,8 +112,6 @@ class NPTFScan(ConfigMaps):
             "units can only be counts or flux"
 
         # Add template to non_poiss_models dictionary
-        # With tag to indicate whether a flux template has been applied to 
-        # a given non_poiss template. Default set to False.
         self.non_poiss_models[template_name] = {'prior_range': prior_range,
                                                 'log_prior': log_prior_list,
                                                 'model_tag': model_tag,
@@ -189,7 +186,7 @@ class NPTFScan(ConfigMaps):
             # If relative, just adjust the highest break
             if is_flux and is_relative:
                 npt_params = self.non_poiss_models[key]['n_params_total']
-                npt_breaks = (npt_params - 2) / 2
+                npt_breaks = int((npt_params - 2) / 2)
                 break_locs = range(npt_breaks + 2, 2 * npt_breaks + 2)
                 highest_break = npt_breaks + 2
 
@@ -225,7 +222,7 @@ class NPTFScan(ConfigMaps):
             # If not relative, adjust all breaks
             if is_flux and not is_relative:
                 npt_params = self.non_poiss_models[key]['n_params_total']
-                npt_breaks = (npt_params - 2) / 2
+                npt_breaks = int((npt_params - 2) / 2)
                 break_locs = range(npt_breaks + 2, 2 * npt_breaks + 2)
 
                 # Check if there are any fixed breaks and adjust
@@ -289,12 +286,6 @@ class NPTFScan(ConfigMaps):
         self.n_params = len(self.model_decompression_key)
 
         self.configure_priors()
-
-        # Define array of flux map templates corresponding to NPT templates
-        self.ft_compressed_exp_ary = \
-            [self.flux_maps_dict_nested["fm_"+ list(self.non_poiss_models.keys())[i]]
-             ['flux_map_masked_compressed_expreg']
-             for i in range(self.n_non_poiss_models)]
 
         print('The number of parameters to be fit is', self.n_params)
 
@@ -421,13 +412,12 @@ class NPTFScan(ConfigMaps):
         """ Pass all details to the likelihood evaluator, and define the total
             ll to be the sum of that in each of the exposure regions
         """
+
         ll = 0.0
         for i in range(self.nexp):
             # For each NPT template adjust the breaks to account for the
             # difference in exposure
-            theta_ps_expreg = [[self.theta_ps[j][0] *
-                                self.exposure_mean / self.exposure_means_list[
-                                    i]] +
+            theta_ps_expreg = [[self.theta_ps[j][0]] +
                                list(self.theta_ps[j][1:self.nbreak_ary[j] + 2]) +
                                list(np.array(
                                     self.theta_ps[j][self.nbreak_ary[j] + 2:]) *
@@ -439,9 +429,7 @@ class NPTFScan(ConfigMaps):
             # In evaluating the likelihood extract the exposure region i
             # version of each parameter
             ll += npll.log_like(self.PT_sum_compressed[i], theta_ps_expreg,
-                                self.f_ary, self.df_rho_div_f_ary, 
-                                [ft[i] for ft in
-                                 self.ft_compressed_exp_ary],
+                                self.f_ary, self.df_rho_div_f_ary,
                                 [NPT[i] for NPT in
                                  self.NPT_dist_compressed_exp_ary],
                                 self.masked_compressed_data_expreg[i])
