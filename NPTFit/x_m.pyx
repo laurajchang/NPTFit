@@ -291,14 +291,16 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
             for i in range(len(sb1_ref_ary)):
                 g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1_ref_ary[i] * f2)
                 g0_ref_mat[i,:] = g0_ary_f
-                # g1_ary_f_1 = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1_ref_ary[i] * f2)
-                # g1_ref_mat_1[i,:] = g1_ary_f_1
+                g1_ary_f_1 = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1_ref_ary[i] * f2)
+                g1_ref_mat_1[i,:] = g1_ary_f_1
 
+            g1_ary_f_2 = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2)
+            g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * f2)
             for j in range(len(sb2_ref_ary)):
                 g1_ary_f_2 = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2_ref_ary[j] * f2) 
                 g1_ref_mat_2[j,:] = g1_ary_f_2
-                # g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2_ref_ary[j] * f2)
-                # g2_ref_mat[j,:] = g2_ary_f
+                g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2_ref_ary[j] * f2)
+                g2_ref_mat[j,:] = g2_ary_f
             
             for p in range(npix_roi):
                 for k in range(k_max):
@@ -308,8 +310,8 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
 
             for k in range(k_max):
                 g0_ref_ary = g0_ref_mat[:,k]
-                # g1_ref_ary_1 = g1_ref_mat_1[:,k]
-                # g1_ref_ary_2 = g1_ref_mat_2[:,k]
+                g1_ref_ary_1 = g1_ref_mat_1[:,k]
+                g1_ref_ary_2 = g1_ref_mat_2[:,k]
                 g2_ref_ary = g2_ref_mat[:,k]
                 sb1_eff_ary = sb1_eff_mat[:,k]
                 sb2_eff_ary = sb2_eff_mat[:,k]
@@ -321,19 +323,19 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
                     g0_int_ary = interp.logloginterp1d(sb1_ref_ary, g0_ref_ary, sb1_eff_ary)
                 g0_mat_f[:,k] = g0_int_ary
 
-                # minval1_1 = findmin.minval(g1_ref_ary_1)
-                # if minval1_1 <= 0:
-                #     g1_int_ary_1 = interp.logloginterp1d(sb1_ref_ary, g1_ref_ary_1, sb1_eff_ary, offset = 1-minval1_1) 
-                # else:
-                #     g1_int_ary_1 = interp.logloginterp1d(sb1_ref_ary, g1_ref_ary_1, sb1_eff_ary)
-                # g1_mat_f_1[:,k] = g1_int_ary_1
+                minval1_1 = findmin.minval(g1_ref_ary_1)
+                if minval1_1 <= 0:
+                    g1_int_ary_1 = interp.logloginterp1d(sb1_ref_ary, g1_ref_ary_1, sb1_eff_ary, offset = 1-minval1_1) 
+                else:
+                    g1_int_ary_1 = interp.logloginterp1d(sb1_ref_ary, g1_ref_ary_1, sb1_eff_ary)
+                g1_mat_f_1[:,k] = g1_int_ary_1
 
-                # minval1_2 = findmin.minval(g1_ref_ary_2)
-                # if minval1_2 <= 0:
-                #     g1_int_ary_2 = interp.logloginterp1d(sb2_ref_ary, g1_ref_ary_2, sb2_eff_ary, offset = 1-minval1_2) 
-                # else:
-                #     g1_int_ary_2 = interp.logloginterp1d(sb2_ref_ary, g1_ref_ary_2, sb2_eff_ary)
-                # g1_mat_f_2[:,k] = g1_int_ary_2
+                minval1_2 = findmin.minval(g1_ref_ary_2)
+                if minval1_2 <= 0:
+                    g1_int_ary_2 = interp.logloginterp1d(sb2_ref_ary, g1_ref_ary_2, sb2_eff_ary, offset = 1-minval1_2) 
+                else:
+                    g1_int_ary_2 = interp.logloginterp1d(sb2_ref_ary, g1_ref_ary_2, sb2_eff_ary)
+                g1_mat_f_2[:,k] = g1_int_ary_2
 
                 minval2 = findmin.minval(g2_ref_ary)
                 if minval2 <= 0:
@@ -341,7 +343,8 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
                 else:
                     g2_int_ary = interp.logloginterp1d(sb2_ref_ary, g2_ref_ary, sb2_eff_ary)
                 g2_mat_f[:,k] = g2_int_ary
-
+            print("Finished interpolating!")
+            # print("Using exact values!")
             for p in range(npix_roi):
                 a_ps = float(theta[0])/ft_compressed[p]
                 sb1 = ft_compressed[p] * float(theta[4])
@@ -354,6 +357,11 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
                 pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * f2, n2 - n1)
                 pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * f2, n3 - n2)
 
+                # g0_int_ary = igf.incgamma_up_fct_ary(int(data[p]+1), 1. - n1, sb1 * f2)
+                # g1_int_ary_1 = igf.incgamma_up_fct_ary(int(data[p]+1), 1. - n2, sb1 * f2)
+                # g1_int_ary_2 = igf.incgamma_up_fct_ary(int(data[p]+1), 1. - n2, sb2 * f2)
+                # g2_int_ary = igf.incgamma_lo_fct_ary(int(data[p]+1), 1. - n3, sb2 * f2)
+
                 x_m_sum_f = a_ps * (sb1 * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary
                             + first1_x_m_sum_ary*second1_x_m_sum_ary
                             + first2_x_m_sum_ary*second2_x_m_sum_ary) \
@@ -361,12 +369,13 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
                 x_m_sum[p] += df_rho_div_f2 * x_m_sum_f
 
                 for k in range(data[p]+1):
+                    # x_m_ary_f = a_ps * (pref0_x_m_ary * g0_int_ary[k] 
+                    #             + pref1_x_m_ary * (g1_int_ary_2[k] - g1_int_ary_1[k])
+                    #             + pref2_x_m_ary * g2_int_ary[k]) * npt_compressed[p]
                     x_m_ary_f = a_ps * (pref0_x_m_ary * g0_mat_f[p,k] 
-                                + pref1_x_m_ary * (g1_ary_f[k])
+                                + pref1_x_m_ary * (g1_mat_f_2[p,k] - g1_mat_f_1[p,k])
                                 + pref2_x_m_ary * g2_mat_f[p,k]) * npt_compressed[p]
-                    # x_m_ary_f = a_ps * (pref0_x_m_ary * g0_mat_f[p,k] 
-                    #             + pref1_x_m_ary * (g1_mat_f_2[p,k] - g1_mat_f_1[p,k])
-                    #             + pref2_x_m_ary * g2_mat_f[p,k]) * npt_compressed[p]
+                    # print('x_m=',x_m_ary_f)
                     x_m_ary[p,k] += df_rho_div_f2 * x_m_ary_f
 
         else:

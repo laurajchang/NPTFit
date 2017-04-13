@@ -118,7 +118,7 @@ def loginterp1d(double[:] x, double[:] y, double[:] new_x, skipzero = True):
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off bounds-checking for entire function
-def logloginterp1d(double[:] x, double[:] y, double[:] new_x, double offset = 0, skipzero = False):
+def logloginterp1d(double[:] x, double[:] y, double[:] new_x, double offset = 0, skipzero = True):
     """
     interp1d(x, y, new_x)
 

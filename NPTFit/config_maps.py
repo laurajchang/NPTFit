@@ -16,6 +16,7 @@ from __future__ import absolute_import
 
 import numpy as np
 import numpy.ma as ma
+import scipy.stats.mstats as mstats
 
 from .set_dirs import SetDirs  # Module for creating directories
 
@@ -93,7 +94,7 @@ class ConfigMaps(SetDirs):
         flux_map_label = "fm_" + label
         self.flux_maps_dict.update({flux_map_label: flux_map})
 
-    def load_flux_map(self, flux_map, label, meanone = True, units='counts'):
+    def load_flux_map(self, flux_map, label, meanone = True, units='flux'):
         """ Function to add a flux map to the flux map dictionary and array
 
             Note maps should be exposure corrected, so that they model
@@ -116,6 +117,7 @@ class ConfigMaps(SetDirs):
                 "Must provide exposure map before adding a flux map"
             assert (len(self.exposure_map) == len(flux_map)), \
                 "Flux map must be the same shape as the exposure map"
+            print("Converted flux map to counts!")
             flux_map *= self.exposure_map
         assert(len(self.templates) != 0), \
             "Must load a template before setting up the scan"
@@ -125,7 +127,6 @@ class ConfigMaps(SetDirs):
             flux_map = flux_map/np.mean(flux_map)
         flux_map_label = "fm_" + label
         self.flux_maps_dict.update({flux_map_label: flux_map})
-
         print("Flux map has mean", np.mean(flux_map), "counts, to be added to " + label)
 
     def compress_data_and_templates(self):

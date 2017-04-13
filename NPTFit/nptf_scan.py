@@ -287,6 +287,11 @@ class NPTFScan(ConfigMaps):
 
         self.configure_priors()
 
+        self.ft_compressed_exp_ary = \
+            [self.flux_maps_dict_nested["fm_"+ list(self.non_poiss_models.keys())[i]]
+            ['flux_map_masked_compressed_expreg']
+            for i in range(self.n_non_poiss_models)]
+
         print('The number of parameters to be fit is', self.n_params)
 
     def make_pt_sum_theta(self, theta):
@@ -430,6 +435,8 @@ class NPTFScan(ConfigMaps):
             # version of each parameter
             ll += npll.log_like(self.PT_sum_compressed[i], theta_ps_expreg,
                                 self.f_ary, self.df_rho_div_f_ary,
+                                [ft[i] for ft in
+                                  self.ft_compressed_exp_ary],
                                 [NPT[i] for NPT in
                                  self.NPT_dist_compressed_exp_ary],
                                 self.masked_compressed_data_expreg[i])
