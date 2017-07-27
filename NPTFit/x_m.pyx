@@ -343,7 +343,7 @@ def return_xs_2break(double[::1] theta, double[::1] f_ary,
                 else:
                     g2_int_ary = interp.logloginterp1d(sb2_ref_ary, g2_ref_ary, sb2_eff_ary)
                 g2_mat_f[:,k] = g2_int_ary
-            print("Finished interpolating!")
+            # print("Finished interpolating!")
             # print("Using exact values!")
             for p in range(npix_roi):
                 a_ps = float(theta[0])/ft_compressed[p]

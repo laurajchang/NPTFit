@@ -189,10 +189,13 @@ class ConfigMaps(SetDirs):
         self.flux_maps_dict_nested = {}
         for key in flux_keys:
             if len(the_flux_dict[key]) == 0:
+                ft_compressed_expreg = []
+                for i in range(self.nexp):
+                    ft_compressed_expreg.append(np.array([]))
                 self.flux_maps_dict_nested.update({key: {'flux_map': 
                                                         the_flux_dict[key],
                                                         'flux_map_masked_compressed':[np.array([])],
-                                                        'flux_map_masked_compressed_expreg':[np.array([])]}})
+                                                        'flux_map_masked_compressed_expreg':ft_compressed_expreg}})
             else:
                 self.flux_maps_dict_nested.update({key: {'flux_map':
                                                         the_flux_dict[key],

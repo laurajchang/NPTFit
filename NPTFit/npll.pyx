@@ -62,7 +62,7 @@ def log_like(pt_sum_compressed, theta, f_ary, df_rho_div_f_ary, ft_compressed, n
         x_m_ary += np.asarray(x_m_ary_out)
         x_m_sum += np.asarray(x_m_sum_out)
 
-        # print("params=",theta[i])
+        # print "params",i,"=",theta[i] 
     return log_like_internal(pt_sum_compressed, data, x_m_ary, x_m_sum, k_max,
                              npixROI)
 
