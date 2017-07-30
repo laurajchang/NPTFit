@@ -621,7 +621,7 @@ class NPTFScan(ConfigMaps):
                     self.model_decompression_key.insert(index +
                                                         int(fixed[0]),
                                                         [key, False])
-            index += self.non_poiss_models[key]['n_params_total']
+            # index += self.non_poiss_models[key]['n_params_total']
 
     @staticmethod
     def convert_log_list(the_list, is_log):
