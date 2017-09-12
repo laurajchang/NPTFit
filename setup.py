@@ -4,28 +4,28 @@ from Cython.Build import cythonize
 import numpy
 
 extensions = [
-    Extension("NPTFit.npll", ["NPTFit/npll.pyx"],
+    Extension("NPTFit_ftreg.npll", ["NPTFit_ftreg/npll.pyx"],
         include_dirs=[numpy.get_include()], extra_compile_args=["-ffast-math",'-O3']),
-    Extension("NPTFit.pll", ["NPTFit/pll.pyx"],
+    Extension("NPTFit_ftreg.pll", ["NPTFit_ftreg/pll.pyx"],
         include_dirs=[numpy.get_include()], extra_compile_args=["-ffast-math",'-O3']),
-    Extension("NPTFit.incgamma_fct_p", ["NPTFit/incgamma_fct_p.pyx"],
+    Extension("NPTFit_ftreg.incgamma_fct_p", ["NPTFit_ftreg/incgamma_fct_p.pyx"],
         include_dirs=[numpy.get_include()], extra_compile_args=["-ffast-math",'-O3']),
-    Extension("NPTFit.x_m", ["NPTFit/x_m.pyx"],
+    Extension("NPTFit_ftreg.x_m", ["NPTFit_ftreg/x_m.pyx"],
         include_dirs=[numpy.get_include()], extra_compile_args=["-ffast-math",'-O3']),
-    Extension("NPTFit.incgamma_fct", ["NPTFit/incgamma_fct.pyx"],
+    Extension("NPTFit_ftreg.incgamma_fct", ["NPTFit_ftreg/incgamma_fct.pyx"],
         include_dirs=[numpy.get_include()], libraries=["gsl", "gslcblas", "m"],
         extra_compile_args=["-ffast-math",'-O3']),
-    Extension("NPTFit.interp1d", ["NPTFit/interp1d.pyx"],
+    Extension("NPTFit_ftreg.interp1d", ["NPTFit_ftreg/interp1d.pyx"],
         include_dirs=[numpy.get_include()], extra_compile_args=["-ffast-math",'-O3']),
-    Extension("NPTFit.findmin", ["NPTFit/findmin.pyx"],
+    Extension("NPTFit_ftreg.findmin", ["NPTFit_ftreg/findmin.pyx"],
         include_dirs=[numpy.get_include()], extra_compile_args=["-ffast-math",'-O3'])
 ]
 
 setup(
-    name='NPTFit',
+    name='NPTFit_ftreg',
     version='0.1.1',
     description='A Python package for Non-Poissonian Template Fitting',
-    url='https://github.com/bsafdi/NPTFit',
+    url='https://github.com/ljchang/NPTFit',
     author='Siddharth Mishra-Sharma',
     author_email='smsharma@princeton.edu',
     license='MIT',
@@ -40,6 +40,6 @@ setup(
             'mpmath',
         ],
 
-    packages=['NPTFit'],
+    packages=['NPTFit_ftreg'],
     ext_modules = cythonize(extensions)
 )

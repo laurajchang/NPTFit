@@ -30,6 +30,7 @@ class NPTF(NPTFScan):
             Defaults to these being a delta function, which is the case if
             there is no PSF correction
             :param nexp: Number of exposure regions to calculate the NPTF within
+            :param nftreg: Number of flux regions to split flux template into
         """
 
         self.f_ary = f_ary
@@ -48,3 +49,5 @@ class NPTF(NPTFScan):
         else:
             # Define the non-Poissonian likelihood
             self.ll = self.log_like_nptf
+
+        print("Using NPTFit with flux template flux regions implemented")

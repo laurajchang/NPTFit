@@ -167,7 +167,7 @@
 			"file": "npll.pyx",
 			"settings":
 			{
-				"buffer_size": 4260,
+				"buffer_size": 4256,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -184,7 +184,16 @@
 			"file": "nptf_scan.py",
 			"settings":
 			{
-				"buffer_size": 30507,
+				"buffer_size": 31380,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/laurachang/NPTFit/sftp-config.json",
+			"settings":
+			{
+				"buffer_size": 1445,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -193,7 +202,7 @@
 			"file": "config_maps.py",
 			"settings":
 			{
-				"buffer_size": 12281,
+				"buffer_size": 16023,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -211,8 +220,8 @@
 		{
 			"contents": "###############################################################################\n# x_m.pyx\n###############################################################################\n#\n# Calculates x_m and x_m_sum arrays for arbitary number of breaks.\n# Uses dedicated functions for 1, 2 and 3 breaks as well as n > 3 breaks.\n#\n###############################################################################\n\nimport numpy as np\ncimport numpy as np\ncimport cython\nfrom cpython cimport bool\n\n# from libc.math cimport fabs\n\ntry:\n    import incgamma_fct as igf\n    print(\"Using C x_m\")\nexcept ImportError:\n    import incgamma_fct_p as igf\n    print(\"Using Python x_m\")\n\nimport interp1d as interp\nimport findmin\n\n# Type used for all non-integer functions\nDTYPE = np.float\n\n# Setup cython functions used\ncdef extern from \"math.h\":\n    double pow(double x, double y) nogil\n\n\ndef return_xs(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary, \n              double[::1] ft_compressed, double[::1] npt_compressed, int[::1] data):\n    \"\"\" Returns arrays of x_m and x_m_sum for likelihood calculations\n\n        :param theta: Array of parameters, [A, n[1], .., n[j+1], Sb[1], .., Sb[j]]\n        :param f_ary: Photon leakage probabilities characterizing PSF, sum(f_ary) = 1.0\n        :param df_rho_div_f_ary: df*rho(f)/f for integrating over f as a sum\n        :param ft_compressed: Pixel-wise flux template. For a nontrivial flux template, scaling\n        flux by a factor of c corresponds to scaling normalization A by 1/c and breaks Sb[j] by c.\n        :param npt_compressed: Pixel-wise normalization of the PS template\n        :param data: The pixel-wise data\n        :returns: A list containing (x_m, x_m_sum)\n    \"\"\"\n\n    cdef int n_break = int((len(theta) - 2)/2) \n\n    if n_break == 1:\n        return return_xs_1break(theta, f_ary, df_rho_div_f_ary, ft_compressed, npt_compressed,\n                                data)\n    elif n_break == 2:\n        # return return_xs_2break_orig(theta, f_ary, df_rho_div_f_ary, npt_compressed, data)\n        return return_xs_2break(theta, f_ary, df_rho_div_f_ary, ft_compressed, npt_compressed,\n                                data)\n    elif n_break == 3:\n        return return_xs_3break(theta, f_ary, df_rho_div_f_ary, ft_compressed, npt_compressed,\n                                data)\n    else:\n        return return_xs_lbreak(theta, n_break, f_ary, df_rho_div_f_ary, \n                                npt_compressed, data)\n        print(\"Sorry, flux template not yet implemented!\")\n\n@cython.boundscheck(False)\n@cython.wraparound(False)\n@cython.cdivision(True)\n@cython.initializedcheck(False)\ndef return_xs_1break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary, \n                     double[::1] ft_compressed, double[::1] npt_compressed, int[::1] data):\n    \"\"\" Dedicated calculation of x_m and x_m_sum for 1 break \n    \"\"\"\n\n    cdef double a_ps = float(theta[0])\n    cdef double n1 = float(theta[1])\n    cdef double n2 = float(theta[2])\n    cdef double sb = float(theta[3])\n\n    cdef int k_max = int(max(data) + 1)\n    cdef int npix_roi = len(npt_compressed)\n\n    cdef double[:,::1] x_m_ary = np.zeros((npix_roi,k_max + 1), dtype=DTYPE)\n    cdef double[::1] x_m_sum = np.zeros(npix_roi, dtype=DTYPE)\n\n    cdef double[::1] g1_ary_f = np.empty(k_max + 1, dtype=DTYPE)\n    cdef double[::1] g2_ary_f = np.empty(k_max + 1, dtype=DTYPE)\n\n    cdef double f2, df_rho_div_f2\n    cdef double pref1_x_m_ary, pref2_x_m_ary\n    cdef double x_m_sum_f, x_m_ary_f\n    cdef double minval1, minval2\n\n    cdef Py_ssize_t f_index, p, k, i\n\n    cdef double[:] sb_ref_ary = sb*np.logspace(-1, 1, 11, dtype=DTYPE)\n\n    cdef double[:,::1] g1_ref_mat = np.empty((len(sb_ref_ary), k_max + 1), dtype=DTYPE)\n    cdef double[:,::1] g2_ref_mat = np.empty((len(sb_ref_ary), k_max + 1), dtype=DTYPE)\n\n    cdef double[:,::1] g1_mat_f = np.empty((npix_roi, k_max+1), dtype=DTYPE)\n    cdef double[:,::1] g2_mat_f = np.empty((npix_roi, k_max+1), dtype=DTYPE)\n\n    cdef double[:] g1_ref_ary = np.empty(len(sb_ref_ary), dtype=DTYPE)\n    cdef double[:] g2_ref_ary = np.empty(len(sb_ref_ary), dtype=DTYPE)\n\n    cdef double[:] g1_int_ary = np.empty(npix_roi, dtype=DTYPE)\n    cdef double[:] g2_int_ary = np.empty(npix_roi, dtype=DTYPE)\n\n    cdef double[::1] ffac_ary = np.empty(npix_roi, dtype=DTYPE)\n    cdef double[:] sb_eff_ary = np.empty (npix_roi, dtype=DTYPE)\n    cdef double[:,::1] sb_eff_mat = np.zeros((npix_roi, k_max+1), dtype=DTYPE)\n\n    cdef bool ft_cond = False\n\n    if len(ft_compressed) != 0:\n        ft_cond = True\n        # print(\"Nontrivial flux template provided\")\n        # assert(0 not in ft_compressed), \\\n        #     \"Flux template contains one or more 0's!\"       \n    # if ft_cond != True:\n    #     print(\"No nontrivial flux templates\")\n\n    for f_index in range(len(f_ary)):\n        f2 = float(f_ary[f_index])\n        df_rho_div_f2 = df_rho_div_f_ary[f_index]\n\n        # For the case of a nontrivial flux template, generate matrix of incomplete gamma function values\n        # to interpolate about, and interpolate appropriately for each pixel\n        if ft_cond:\n            for i in range(len(sb_ref_ary)):\n                g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb_ref_ary[i] * f2)\n                g1_ref_mat[i,:] = g1_ary_f\n                g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2, sb_ref_ary[i] * f2)\n                g2_ref_mat[i,:] = g2_ary_f\n            \n            for p in range(npix_roi):\n                for k in range(k_max):\n                    if k <= data[p]+1:\n                        sb_eff_mat[p,k] = ft_compressed[p] * sb \n\n            for k in range(k_max):\n                g1_ref_ary = g1_ref_mat[:,k]\n                g2_ref_ary = g2_ref_mat[:,k]\n                sb_eff_ary = sb_eff_mat[:,k]\n                # print(\"sb_eff_ary = \", sb_eff_ary)\n\n                minval1 = findmin.minval(g1_ref_ary)\n                if minval1 <= 0:\n                    g1_int_ary = interp.logloginterp1d(sb_ref_ary, g1_ref_ary, sb_eff_ary, offset = 1-minval1) \n                else:\n                    g1_int_ary = interp.logloginterp1d(sb_ref_ary, g1_ref_ary, sb_eff_ary)\n                g1_mat_f[:,k] = g1_int_ary\n                # print(\"g1_int_ary = \", g1_int_ary)\n\n                minval2 = findmin.minval(g2_ref_ary)\n                if minval2 <= 0:\n                    g2_int_ary = interp.logloginterp1d(sb_ref_ary, g2_ref_ary, sb_eff_ary, offset = 1-minval2) \n                else:\n                    g2_int_ary = interp.logloginterp1d(sb_ref_ary, g2_ref_ary, sb_eff_ary)\n                g2_mat_f[:,k] = g2_int_ary\n                # print(\"g2_int_ary = \", np.asarray(g2_int_ary))\n\n\n            for p in range(npix_roi):\n                a_ps = float(theta[0])/ft_compressed[p]\n                sb = ft_compressed[p] * float(theta[3])\n\n                pref1_x_m_ary =  pow(sb * f2, n1)\n                pref2_x_m_ary = pow(sb * f2, n2)\n\n                x_m_sum_f = a_ps*sb*f2*(1/(n1-1)+1/(1-n2)) * npt_compressed[p]\n                x_m_sum[p] += df_rho_div_f2*x_m_sum_f\n\n                for k in range(data[p]+1):\n                    # print('g1=', g1_mat_f[p])\n                    # print('g2=',g2_mat_f[p])\n                    x_m_ary_f = a_ps * (pref1_x_m_ary*g1_mat_f[p,k] + pref2_x_m_ary*g2_mat_f[p,k]) * npt_compressed[p]\n                    x_m_ary[p,k] += df_rho_div_f2*x_m_ary_f\n\n        else:\n            g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb * f2)\n            g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n2, sb * f2)\n\n            for p in range(npix_roi):\n                pref1_x_m_ary =  pow(sb * f2, n1)\n                pref2_x_m_ary = pow(sb * f2, n2)\n\n                x_m_sum_f = a_ps*sb*f2*(1/(n1-1)+1/(1-n2)) * npt_compressed[p]\n                x_m_sum[p] += df_rho_div_f2*x_m_sum_f\n\n                for k in range(data[p]+1):\n                    x_m_ary_f = a_ps * (pref1_x_m_ary*g1_ary_f[k] + pref2_x_m_ary*g2_ary_f[k]) * npt_compressed[p]\n                    x_m_ary[p,k] += df_rho_div_f2*x_m_ary_f\n            \n    x_m_sum = np.asarray(x_m_sum) - np.asarray(x_m_ary)[:,0] \n\n    # return np.asarray(g1_ref_mat), np.asarray(g2_ref_mat)\n    return np.asarray(x_m_ary), np.asarray(x_m_sum)\n\n@cython.boundscheck(False)\n@cython.wraparound(False)\n@cython.cdivision(True)\n@cython.initializedcheck(False)\ndef return_xs_2break(double[::1] theta, double[::1] f_ary, \n                     double[::1] df_rho_div_f_ary, double[::1] ft_compressed, double[::1] npt_compressed,\n                     int[::1] data):\n    \"\"\" Dedicated calculation of x_m and x_m_sum for 2 breaks \n    \"\"\"\n\n    cdef float a_ps = float(theta[0])\n    cdef float n1 = float(theta[1])\n    cdef float n2 = float(theta[2])\n    cdef float n3 = float(theta[3])\n    cdef float sb1 = float(theta[4])\n    cdef float sb2 = float(theta[5])\n\n    cdef int k_max = int(np.max(data) + 1)\n    cdef int npix_roi = len(npt_compressed)\n\n    cdef double[:,::1] x_m_ary = np.zeros(shape=(npix_roi,k_max + 1))\n    cdef double[::1] x_m_sum = np.zeros(npix_roi)\n\n    cdef double[::1] g0_ary_f = np.zeros(k_max + 1)\n    cdef double[::1] g1_ary_f = np.zeros(k_max + 1)\n    cdef double[::1] g1_ary_f_1 = np.zeros(k_max + 1)\n    cdef double[::1] g1_ary_f_2 = np.zeros(k_max + 1)\n    cdef double[::1] g2_ary_f = np.zeros(k_max + 1)\n\n    cdef double f2, df_rho_div_f2\n    cdef double pref0_x_m_ary, pref1_x_m_ary, pref2_x_m_ary\n    cdef double first0_x_m_sum_ary, first1_x_m_sum_ary, first2_x_m_sum_ary\n    cdef double second0_x_m_sum_ary, second1_x_m_sum_ary, second2_x_m_sum_ary\n    cdef double x_m_sum_f, x_m_ary_f\n    cdef double minval0, minval1, minval2\n\n    cdef Py_ssize_t f_index, p, k, i, j\n\n    first0_x_m_sum_ary = 1/(1-n1)\n    first1_x_m_sum_ary = 1/(1-n2)\n    first2_x_m_sum_ary = 1/(1-n3)\n \n    second0_x_m_sum_ary = -1.0\n    second1_x_m_sum_ary = (1 - pow(sb2/sb1, 1-n2))\n    second2_x_m_sum_ary = pow(sb2/sb1, 1-n2)\n\n    cdef double[:] sb1_ref_ary = sb1*np.logspace(-1, 1, 11, dtype=DTYPE)\n    cdef double[:] sb2_ref_ary = sb2*np.logspace(-1, 1, 11, dtype=DTYPE)\n\n    cdef double[:,::1] g0_ref_mat = np.empty((len(sb1_ref_ary), k_max + 1), dtype=DTYPE)\n    cdef double[:,::1] g1_ref_mat_1 = np.empty((len(sb1_ref_ary), k_max + 1), dtype=DTYPE)\n    cdef double[:,::1] g1_ref_mat_2 = np.empty((len(sb2_ref_ary), k_max + 1), dtype=DTYPE)\n    cdef double[:,::1] g2_ref_mat = np.empty((len(sb2_ref_ary), k_max + 1), dtype=DTYPE)\n\n    cdef double[:,::1] g0_mat_f = np.empty((npix_roi, k_max+1), dtype=DTYPE)    \n    cdef double[:,::1] g1_mat_f_1 = np.empty((npix_roi, k_max+1), dtype=DTYPE)\n    cdef double[:,::1] g1_mat_f_2 = np.empty((npix_roi, k_max+1), dtype=DTYPE)\n    cdef double[:,::1] g2_mat_f = np.empty((npix_roi, k_max+1), dtype=DTYPE)\n\n    cdef double[:] g0_ref_ary = np.empty(len(sb1_ref_ary), dtype=DTYPE)\n    cdef double[:] g1_ref_ary_1 = np.empty(len(sb1_ref_ary), dtype=DTYPE)\n    cdef double[:] g1_ref_ary_2 = np.empty(len(sb2_ref_ary), dtype=DTYPE)\n    cdef double[:] g2_ref_ary = np.empty(len(sb2_ref_ary), dtype=DTYPE)\n\n    cdef double[:] g0_int_ary = np.empty(npix_roi, dtype=DTYPE)\n    cdef double[:] g1_int_ary_1 = np.empty(npix_roi, dtype=DTYPE)\n    cdef double[:] g1_int_ary_2 = np.empty(npix_roi, dtype=DTYPE)\n    cdef double[:] g2_int_ary = np.empty(npix_roi, dtype=DTYPE)\n\n    cdef double[::1] ffac_ary = np.empty(npix_roi, dtype=DTYPE)\n    cdef double[:] sb1_eff_ary = np.empty (npix_roi, dtype=DTYPE)\n    cdef double[:] sb2_eff_ary = np.empty (npix_roi, dtype=DTYPE)\n    cdef double[:,::1] sb1_eff_mat = np.zeros((npix_roi, k_max+1), dtype=DTYPE)\n    cdef double[:,::1] sb2_eff_mat = np.zeros((npix_roi, k_max+1), dtype=DTYPE)\n\n    cdef bool ft_cond = False\n\n    if len(ft_compressed) != 0:\n        ft_cond = True\n        # print(\"Nontrivial flux template provided\")\n        # assert(0 not in ft_compressed), \\\n        #     \"Flux template contains one or more 0's!\"       \n    # if ft_cond != True:\n    #     print(\"No nontrivial flux templates\")\n\n    for f_index in range(len(f_ary)):\n        f2 = float(f_ary[f_index])\n        df_rho_div_f2 = df_rho_div_f_ary[f_index]\n\n        if ft_cond:\n            for i in range(len(sb1_ref_ary)):\n                g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1_ref_ary[i] * f2)\n                g0_ref_mat[i,:] = g0_ary_f\n                g1_ary_f_1 = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1_ref_ary[i] * f2)\n                g1_ref_mat_1[i,:] = g1_ary_f_1\n\n            # g1_ary_f_2 = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2)\n            # g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * f2)\n            for j in range(len(sb2_ref_ary)):\n                g1_ary_f_2 = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2_ref_ary[j] * f2) \n                g1_ref_mat_2[j,:] = g1_ary_f_2\n                g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2_ref_ary[j] * f2)\n                g2_ref_mat[j,:] = g2_ary_f\n            \n            for p in range(npix_roi):\n                for k in range(k_max):\n                    if k <= data[p]+1:\n                        sb1_eff_mat[p,k] = ft_compressed[p] * sb1\n                        sb2_eff_mat[p,k] = ft_compressed[p] * sb2\n\n            for k in range(k_max):\n                g0_ref_ary = g0_ref_mat[:,k]\n                g1_ref_ary_1 = g1_ref_mat_1[:,k]\n                g1_ref_ary_2 = g1_ref_mat_2[:,k]\n                g2_ref_ary = g2_ref_mat[:,k]\n                sb1_eff_ary = sb1_eff_mat[:,k]\n                sb2_eff_ary = sb2_eff_mat[:,k]\n\n                minval0 = findmin.minval(g0_ref_ary)\n                if minval0 <= 0:\n                    g0_int_ary = interp.logloginterp1d(sb1_ref_ary, g0_ref_ary, sb1_eff_ary, offset = 1-minval0) \n                else:\n                    g0_int_ary = interp.logloginterp1d(sb1_ref_ary, g0_ref_ary, sb1_eff_ary)\n                g0_mat_f[:,k] = g0_int_ary\n\n                minval1_1 = findmin.minval(g1_ref_ary_1)\n                if minval1_1 <= 0:\n                    g1_int_ary_1 = interp.logloginterp1d(sb1_ref_ary, g1_ref_ary_1, sb1_eff_ary, offset = 1-minval1_1) \n                else:\n                    g1_int_ary_1 = interp.logloginterp1d(sb1_ref_ary, g1_ref_ary_1, sb1_eff_ary)\n                g1_mat_f_1[:,k] = g1_int_ary_1\n\n                minval1_2 = findmin.minval(g1_ref_ary_2)\n                if minval1_2 <= 0:\n                    g1_int_ary_2 = interp.logloginterp1d(sb2_ref_ary, g1_ref_ary_2, sb2_eff_ary, offset = 1-minval1_2) \n                else:\n                    g1_int_ary_2 = interp.logloginterp1d(sb2_ref_ary, g1_ref_ary_2, sb2_eff_ary)\n                g1_mat_f_2[:,k] = g1_int_ary_2\n\n                minval2 = findmin.minval(g2_ref_ary)\n                if minval2 <= 0:\n                    g2_int_ary = interp.logloginterp1d(sb2_ref_ary, g2_ref_ary, sb2_eff_ary, offset = 1-minval2) \n                else:\n                    g2_int_ary = interp.logloginterp1d(sb2_ref_ary, g2_ref_ary, sb2_eff_ary)\n                g2_mat_f[:,k] = g2_int_ary\n            # print(\"Finished interpolating!\")\n            # print(\"Using exact values!\")\n            for p in range(npix_roi):\n                a_ps = float(theta[0])/ft_compressed[p]\n                sb1 = ft_compressed[p] * float(theta[4])\n                sb2 = ft_compressed[p] * float(theta[5])\n             \n                second1_x_m_sum_ary = (1 - pow(sb2/sb1, 1-n2))\n                second2_x_m_sum_ary = pow(sb2/sb1, 1-n2)\n\n                pref0_x_m_ary = pow(sb1 * f2, n1)\n                pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * f2, n2 - n1)\n                pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * f2, n3 - n2)\n\n                # g0_int_ary = igf.incgamma_up_fct_ary(int(data[p]+1), 1. - n1, sb1 * f2)\n                # g1_int_ary_1 = igf.incgamma_up_fct_ary(int(data[p]+1), 1. - n2, sb1 * f2)\n                # g1_int_ary_2 = igf.incgamma_up_fct_ary(int(data[p]+1), 1. - n2, sb2 * f2)\n                # g2_int_ary = igf.incgamma_lo_fct_ary(int(data[p]+1), 1. - n3, sb2 * f2)\n\n                x_m_sum_f = a_ps * (sb1 * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary\n                            + first1_x_m_sum_ary*second1_x_m_sum_ary\n                            + first2_x_m_sum_ary*second2_x_m_sum_ary) \\\n                            * npt_compressed[p]\n                x_m_sum[p] += df_rho_div_f2 * x_m_sum_f\n\n                for k in range(data[p]+1):\n                    # x_m_ary_f = a_ps * (pref0_x_m_ary * g0_int_ary[k] \n                    #             + pref1_x_m_ary * (g1_int_ary_2[k] - g1_int_ary_1[k])\n                    #             + pref2_x_m_ary * g2_int_ary[k]) * npt_compressed[p]\n                    x_m_ary_f = a_ps * (pref0_x_m_ary * g0_mat_f[p,k] \n                                + pref1_x_m_ary * (g1_mat_f_2[p,k] - g1_mat_f_1[p,k])\n                                + pref2_x_m_ary * g2_mat_f[p,k]) * npt_compressed[p]\n                    # print('x_m=',x_m_ary_f)\n                    x_m_ary[p,k] += df_rho_div_f2 * x_m_ary_f\n\n        else:\n            g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * f2)\n            g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2) \\\n                       - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * f2)\n            g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * f2)\n\n            pref0_x_m_ary = pow(sb1 * f2, n1)\n            pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * f2, n2 - n1)\n            pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * f2, n3 - n2)\n\n            for p in range(npix_roi):\n                x_m_sum_f = a_ps * (sb1 * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary\n                            + first1_x_m_sum_ary*second1_x_m_sum_ary\n                            + first2_x_m_sum_ary*second2_x_m_sum_ary) \\\n                            * npt_compressed[p]\n                x_m_sum[p] += df_rho_div_f2 * x_m_sum_f\n\n                for k in range(data[p]+1):\n                    x_m_ary_f = a_ps * (pref0_x_m_ary * g0_ary_f[k] + pref1_x_m_ary\n                                * g1_ary_f[k] + pref2_x_m_ary * g2_ary_f[k]) \\\n                                * npt_compressed[p]\n                    x_m_ary[p,k] += df_rho_div_f2 * x_m_ary_f\n\n    x_m_sum = np.asarray(x_m_sum) - np.asarray(x_m_ary)[:,0] \n\n    return np.asarray(x_m_ary), np.asarray(x_m_sum)\n\n@cython.boundscheck(False)\n@cython.wraparound(False)\n@cython.cdivision(True)\n@cython.initializedcheck(False)\ndef return_xs_2break_orig(double[::1] theta, double[::1] f_ary, \n                     double[::1] df_rho_div_f_ary, double[::1] ft_compressed, double[::1] npt_compressed,\n                     int[::1] data):\n    \"\"\" Dedicated calculation of x_m and x_m_sum for 2 breaks \n    \"\"\"\n\n    cdef float a_ps = float(theta[0])\n    cdef float n1 = float(theta[1])\n    cdef float n2 = float(theta[2])\n    cdef float n3 = float(theta[3])\n    cdef float sb1 = float(theta[4])\n    cdef float sb2 = float(theta[5])\n\n    cdef int k_max = int(np.max(data) + 1)\n    cdef int npix_roi = len(npt_compressed)\n\n    cdef double[:,::1] x_m_ary = np.zeros(shape=(npix_roi,k_max + 1))\n    cdef double[::1] x_m_sum = np.zeros(npix_roi)\n\n    cdef double[::1] g0_ary_f = np.zeros(k_max + 1)\n    cdef double[::1] g1_ary_f = np.zeros(k_max + 1)\n    cdef double[::1] g2_ary_f = np.zeros(k_max + 1)\n\n    cdef double f2, df_rho_div_f2\n    cdef double pref0_x_m_ary, pref1_x_m_ary, pref2_x_m_ary\n    cdef double first0_x_m_sum_ary, first1_x_m_sum_ary, first2_x_m_sum_ary\n    cdef double second0_x_m_sum_ary, second1_x_m_sum_ary, second2_x_m_sum_ary\n    cdef double x_m_sum_f, x_m_ary_f\n\n    cdef Py_ssize_t f_index, p, k\n\n    first0_x_m_sum_ary = 1/(1-n1)\n    first1_x_m_sum_ary = 1/(1-n2)\n    first2_x_m_sum_ary = 1/(1-n3)\n\n    second0_x_m_sum_ary = -1.0\n    second1_x_m_sum_ary = (1 - pow(sb2/sb1, 1-n2))\n    second2_x_m_sum_ary = pow(sb2/sb1, 1-n2)\n\n    for f_index in range(len(f_ary)):\n        f2 = float(f_ary[f_index])\n        df_rho_div_f2 = df_rho_div_f_ary[f_index]\n        \n        g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * f2)\n        g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2) \\\n                   - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * f2)\n        g2_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n3, sb2 * f2)\n\n        pref0_x_m_ary = pow(sb1 * f2, n1)\n        pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * f2, n2 - n1)\n        pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * f2, n3 - n2)\n\n        for p in range(npix_roi):\n            x_m_sum_f = a_ps * (sb1 * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary\n                        + first1_x_m_sum_ary*second1_x_m_sum_ary\n                        + first2_x_m_sum_ary*second2_x_m_sum_ary) \\\n                        * npt_compressed[p]\n            x_m_sum[p] += df_rho_div_f2 * x_m_sum_f\n\n            for k in range(data[p]+1):\n                x_m_ary_f = a_ps * (pref0_x_m_ary * g0_ary_f[k] + pref1_x_m_ary\n                            * g1_ary_f[k] + pref2_x_m_ary * g2_ary_f[k]) \\\n                            * npt_compressed[p]\n                x_m_ary[p,k] += df_rho_div_f2 * x_m_ary_f\n\n    x_m_sum = np.asarray(x_m_sum) - np.asarray(x_m_ary)[:,0] \n\n    return np.asarray(x_m_ary), np.asarray(x_m_sum)\n\n@cython.boundscheck(False)\n@cython.wraparound(False)\n@cython.cdivision(True)\n@cython.initializedcheck(False)\ndef return_xs_3break(double[::1] theta, double[::1] f_ary, double[::1] df_rho_div_f_ary, \n                     double[::1] ft_compressed, double[::1] npt_compressed, int[::1] data):\n    \"\"\" Dedicated calculation of x_m and x_m_sum for 3 breaks \n    \"\"\"\n\n    cdef float a_ps = float(theta[0])\n    cdef float n1 = float(theta[1])\n    cdef float n2 = float(theta[2])\n    cdef float n3 = float(theta[3])\n    cdef float n4 = float(theta[4])\n    cdef float sb1 = float(theta[5])\n    cdef float sb2 = float(theta[6])\n    cdef float sb3 = float(theta[7])\n\n    cdef int k_max = int(np.max(data) + 1)\n    cdef int npix_roi = len(npt_compressed)\n\n    cdef double[:,::1] x_m_ary = np.zeros((npix_roi,k_max + 1))\n    cdef double[::1] x_m_sum = np.zeros(npix_roi)\n\n    cdef double[::1] g0_ary_f = np.zeros(k_max + 1)\n    cdef double[::1] g1_ary_f = np.zeros(k_max + 1)\n    cdef double[::1] g2_ary_f = np.zeros(k_max + 1)\n    cdef double[::1] g3_ary_f = np.zeros(k_max + 1)\n\n    cdef double f2, df_rho_div_f2, fluxfac\n    cdef double pref0_x_m_ary, pref1_x_m_ary, pref2_x_m_ary, pref3_x_m_ary\n    cdef double first0_x_m_sum_ary, first1_x_m_sum_ary, first2_x_m_sum_ary\n    cdef double first3_x_m_sum_ary\n    cdef double second0_x_m_sum_ary, second1_x_m_sum_ary, second2_x_m_sum_ary\n    cdef double second3_x_m_sum_ary\n    cdef double x_m_sum_f, x_m_ary_f\n\n    cdef Py_ssize_t f_index, p, k\n\n    first0_x_m_sum_ary = 1/(1-n1)\n    first1_x_m_sum_ary = 1/(1-n2)\n    first2_x_m_sum_ary = 1/(1-n3)\n    first3_x_m_sum_ary = 1/(1-n4)\n\n    second0_x_m_sum_ary = -1.0\n    second1_x_m_sum_ary = (1 - pow(sb2/sb1, 1-n2))\n    second2_x_m_sum_ary = pow(sb2/sb1, 1-n2) * (1 - pow(sb3/sb2, 1-n3))\n    second3_x_m_sum_ary = pow(sb2/sb1, 1-n2) * pow(sb3/sb2, 1-n3)\n\n    for f_index in range(len(f_ary)):\n        f2 = float(f_ary[f_index])\n        df_rho_div_f2 = df_rho_div_f_ary[f_index]\n        g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * f2)\n        g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * f2) \\\n                   - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * f2)\n        g2_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n3, sb3 * f2) \\\n                   - igf.incgamma_up_fct_ary(k_max, 1. - n3, sb2 * f2)\n        g3_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n4, sb3 * f2)\n\n        for p in range(npix_roi):\n            fluxfac = ft_compressed[p]\n            if fluxfac != 1:\n                g0_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n1, sb1 * fluxfac * f2)\n                g1_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n2, sb2 * fluxfac * f2) \\\n                           - igf.incgamma_up_fct_ary(k_max, 1. - n2, sb1 * fluxfac * f2)\n                g2_ary_f = igf.incgamma_up_fct_ary(k_max, 1. - n3, sb3 * fluxfac * f2) \\\n                           - igf.incgamma_up_fct_ary(k_max, 1. - n3, sb2 * fluxfac * f2)\n                g3_ary_f = igf.incgamma_lo_fct_ary(k_max, 1. - n4, sb3 * fluxfac * f2)\n\n            pref0_x_m_ary = pow(sb1 * fluxfac * f2, n1)\n            pref1_x_m_ary = pref0_x_m_ary * pow(sb1 * fluxfac * f2, n2 - n1)\n            pref2_x_m_ary = pref1_x_m_ary * pow(sb2 * fluxfac * f2, n3 - n2)\n            pref3_x_m_ary = pref2_x_m_ary * pow(sb3 * fluxfac * f2, n4 - n3)\n\n            x_m_sum_f = (a_ps/fluxfac * sb1 * fluxfac * f2) * (first0_x_m_sum_ary*second0_x_m_sum_ary\n                        + first1_x_m_sum_ary*second1_x_m_sum_ary\n                        + first2_x_m_sum_ary*second2_x_m_sum_ary\n                        + first3_x_m_sum_ary*second3_x_m_sum_ary) \\\n                        * npt_compressed[p]\n            x_m_sum[p] += df_rho_div_f2 * x_m_sum_f\n\n            for k in range(data[p]+1):\n                x_m_ary_f = a_ps/fluxfac * (pref0_x_m_ary*g0_ary_f[k]\n                            + pref1_x_m_ary*g1_ary_f[k]\n                            + pref2_x_m_ary*g2_ary_f[k]\n                            + pref3_x_m_ary*g3_ary_f[k]) \\\n                            * npt_compressed[p]\n                x_m_ary[p,k] += df_rho_div_f2 * x_m_ary_f\n\n    x_m_sum = np.asarray(x_m_sum) - np.asarray(x_m_ary)[:,0] \n\n    return np.asarray(x_m_ary), np.asarray(x_m_sum)\n\n@cython.boundscheck(False)\n@cython.wraparound(False)\n@cython.cdivision(True)\n@cython.initializedcheck(False)\ndef return_xs_lbreak(double[::1] theta, int n_break, double[::1] f_ary, \n                     double[::1] df_rho_div_f_ary, double[::1] npt_compressed,\n                     int[::1] data):\n    \"\"\" General calculation of x_m and x_m_sum for l breaks \n    \"\"\"\n\n    cdef float a_ps = float(theta[0])\n    cdef double[::1] n_ary = theta[1:n_break + 2]\n    cdef double[::1] sb_ary = theta[n_break + 2: 2*n_break + 2]\n\n    cdef int k_max = int(np.max(data) + 1)\n    cdef int npix_roi = len(npt_compressed)\n\n    cdef double[:,::1] x_m_ary = np.zeros((npix_roi, k_max + 1))\n    cdef double[::1] x_m_sum = np.zeros(npix_roi)\n\n    cdef double[:,::1] g_ary_f_ary = np.zeros((n_break + 1, k_max + 1))\n    cdef double[::1] pref_x_m_ary = np.zeros(n_break + 1)\n\n    cdef double[::1] first_x_m_sum_ary = np.zeros(n_break + 1)\n    cdef double[::1] second_x_m_sum_ary = np.zeros(n_break + 1)\n\n    cdef double[::1] gamma_ary = np.zeros(k_max + 1)\n\n    cdef double f2, df_rho_div_f2\n\n    cdef double[::1] sbpow_ary = np.zeros(n_break + 1)\n\n    cdef double dp = 0.0, dp_sum = 0\n\n    cdef double x_m_sum_f, x_m_ary_f\n\n    cdef Py_ssize_t f_index, p, k, m, i, j\n\n    # Get (Sb[j]/Sb[j+1])**(-n[j]) to avoid having to call pow() repeatedly \n    for j in range(n_break + 1):\n        sbpow_ary[j] = pow(sb_ary[j] / sb_ary[j-1], - n_ary[j])\n\n    # x_m_sum factors 1\n    first_x_m_sum_ary[0] = -1. \n\n    for i in range(1, n_break + 1):\n        first_x_m_sum_ary[i] = first_x_m_sum_ary[0]\n        for j in range(1, i):\n            first_x_m_sum_ary[i] *= pow(sb_ary[j] / sb_ary[j-1], - n_ary[j])\n        first_x_m_sum_ary[i] *= sb_ary[i-1] * ( - 1 + sbpow_ary[i]\n                                * (sb_ary[i] / sb_ary[i-1])) / sb_ary[0]\n\n    first_x_m_sum_ary[n_break] = 1.\n    for j in range(1, n_break):\n        first_x_m_sum_ary[n_break] *= sbpow_ary[j]\n    first_x_m_sum_ary[n_break]  *=  sb_ary[n_break-1] / sb_ary[0]\n\n    # x_m_sum factors 2\n    for i in range(n_break+1):\n        second_x_m_sum_ary[i] = 1/(1 - n_ary[i])\n\n    for f_index in range(len(f_ary)): # PSF loop\n        f2 = float(f_ary[f_index])\n        df_rho_div_f2 = df_rho_div_f_ary[f_index]\n\n        # Terms involving incomplete gamma functions in x_m\n        gamma_ary = igf.incgamma_up_fct_ary(k_max, 1.-n_ary[0], sb_ary[0] * f2)\n        for m in range(k_max + 1):\n            g_ary_f_ary[0][m] = gamma_ary[m]\n\n        for i in range(1, n_break):\n            gamma_ary = igf.incgamma_up_fct_ary(k_max, 1.-n_ary[i], sb_ary[i] * f2) \\\n                        - igf.incgamma_up_fct_ary(k_max, 1.-n_ary[i], sb_ary[i-1] * f2)\n            for m in range(k_max + 1):\n                g_ary_f_ary[i][m] = gamma_ary[m]\n\n        gamma_ary = igf.incgamma_lo_fct_ary(k_max, 1.-n_ary[n_break], sb_ary[n_break-1] * f2)\n        for m in range(k_max + 1):\n            g_ary_f_ary[n_break][m] = gamma_ary[m]\n\n        # Terms not involving incomplete gamma functions in x_m\n        pref_x_m_ary[0] = pow(sb_ary[0] * f2, n_ary[0])\n\n        for i in range(1, n_break + 1):\n            pref_x_m_ary[i] = pref_x_m_ary[i-1] * pow(sb_ary[i-1] * f2, n_ary[i]-n_ary[i-1])\n\n        dp_sum = 0.0\n        for i in range(0, n_break+1):\n            dp_sum += first_x_m_sum_ary[i] *second_x_m_sum_ary[i]\n\n        for p in range(npix_roi):\n            x_m_sum_f = a_ps * sb_ary[0] * f2 * dp_sum * npt_compressed[p]\n            x_m_sum[p] += df_rho_div_f2 * x_m_sum_f\n            \n            for k in range(data[p]+1):\n                dp = 0.0\n                for i in range(0, n_break+1):\n                    dp += pref_x_m_ary[i] * g_ary_f_ary[i][k]\n\n                x_m_ary_f = a_ps * dp * npt_compressed[p]\n                x_m_ary[p,k] += df_rho_div_f2 * x_m_ary_f\n\n    x_m_sum = np.asarray(x_m_sum) - np.asarray(x_m_ary)[:,0] \n\n    return np.asarray(x_m_ary), np.asarray(x_m_sum)\n\n",
 			"file": "x_m.pyx",
-			"file_size": 29173,
-			"file_write_time": 131398743360000000,
+			"file_size": 33912,
+			"file_write_time": 131481967000000000,
 			"settings":
 			{
 				"buffer_size": 29177,
@@ -223,7 +232,7 @@
 			"file": "nptfit.py",
 			"settings":
 			{
-				"buffer_size": 1893,
+				"buffer_size": 1971,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -379,7 +388,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 93.0,
 		"where_history":
 		[
 		]
@@ -513,7 +522,7 @@
 	"groups":
 	[
 		{
-			"selected": 8,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -522,15 +531,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4260,
+						"buffer_size": 4256,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2394,
-								2394
+								0,
+								0
 							]
 						],
 						"settings":
@@ -546,7 +555,7 @@
 						"translation.y": 638.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
@@ -579,7 +588,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -588,15 +597,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 30507,
+						"buffer_size": 31380,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								24642,
-								24647
+								0,
+								0
 							]
 						],
 						"settings":
@@ -609,27 +618,60 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 8292.0,
+						"translation.y": 496.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "config_maps.py",
+					"file": "/Users/laurachang/NPTFit/sftp-config.json",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 12281,
+						"buffer_size": 1445,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6804,
-								6804
+								553,
+								553
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 61.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "config_maps.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16023,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
 							]
 						],
 						"settings":
@@ -641,15 +683,15 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 6.0,
-						"translation.y": 0.0,
+						"translation.x": 0.0,
+						"translation.y": 1079.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "interp1d.pyx",
 					"semi_transient": false,
 					"settings":
@@ -679,11 +721,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 6,
 					"file": "x_m.pyx",
 					"semi_transient": false,
 					"settings":
@@ -712,24 +754,24 @@
 						"translation.y": 6250.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 7,
 					"file": "nptfit.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1893,
+						"buffer_size": 1971,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1677,
-								1679
+								0,
+								0
 							]
 						],
 						"settings":
@@ -745,11 +787,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 8,
 					"file": "incgamma_fct.pyx",
 					"semi_transient": false,
 					"settings":
@@ -778,11 +820,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 9,
 					"file": "dnds_analysis.py",
 					"semi_transient": false,
 					"settings":
@@ -811,7 +853,7 @@
 						"translation.y": 1875.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]

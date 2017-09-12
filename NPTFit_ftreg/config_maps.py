@@ -78,7 +78,7 @@ class ConfigMaps(SetDirs):
 
             .. note:: The exposure must be provided prior to adding a flux
             template. This is then multiplied by the exposure.
-            .. note:: By default, adding a template adds an empty flux map. 
+            .. note:: By default, adding a template adds an empty flux map with 1 flux region. 
         """
 
         if units == 'flux':
@@ -91,10 +91,10 @@ class ConfigMaps(SetDirs):
         self.templates.append(template)
         # Add default flux maps
         flux_map = np.array([])
-        flux_map_label = "fm_" + label
-        self.flux_maps_dict.update({flux_map_label: flux_map})
+        flux_map_label = "ft_" + label
+        self.flux_maps_dict.update({flux_map_label: [flux_map,1]})
 
-    def load_flux_map(self, flux_map, label, meanone = True, units='flux'):
+    def load_flux_map(self, flux_map, label, nftreg=1, meanone=True, units='flux'):
         """ Function to add a flux map to the flux map dictionary and array
 
             Note maps should be exposure corrected, so that they model
@@ -103,6 +103,7 @@ class ConfigMaps(SetDirs):
             :param flux_map: Input flux map
             :param label: String used to identify the template to which 
             the flux map is applied. Note: this must match an applied NPT template.
+            :param nftreg: Number of flux regions to split flux map into
             :param meanone: Flux map has mean one (in counts). Default set to True
             :param units: Units of provided map. By default
             'counts': Map in photon counts
@@ -125,9 +126,9 @@ class ConfigMaps(SetDirs):
             "Must provide template before adding a flux map to it"
         if meanone == True:
             flux_map = flux_map/np.mean(flux_map)
-        flux_map_label = "fm_" + label
-        self.flux_maps_dict.update({flux_map_label: flux_map})
-        print("Flux map has mean", np.mean(flux_map), "counts, to be added to " + label)
+        flux_map_label = "ft_" + label
+        self.flux_maps_dict.update({flux_map_label: [flux_map,nftreg]})
+        print("Flux map has mean", np.mean(flux_map), "counts, to be added to ", label, ", with ", nftreg, " flux regions")
 
     def compress_data_and_templates(self):
         """ Compress data, exposure and templates
@@ -183,26 +184,59 @@ class ConfigMaps(SetDirs):
             self.masked_compressed_data_expreg.append(np.array(
                  temp_data_expreg.compressed(), dtype='int32'))
 
-        # Create a nested dictionary of different versions of the flux maps
+        # Create a nested dictionary of different versions of the flux templates (in flux regions)
+        # Note: this has only been implemented for the case where all nontrivial flux templates are 
+        # subdivided into flux regions
+
         the_flux_dict = self.flux_maps_dict
         flux_keys = self.flux_maps_dict.keys()
         self.flux_maps_dict_nested = {}
         for key in flux_keys:
-            if len(the_flux_dict[key]) == 0:
+            if len(the_flux_dict[key][0]) == 0:
                 ft_compressed_expreg = []
                 for i in range(self.nexp):
                     ft_compressed_expreg.append(np.array([]))
                 self.flux_maps_dict_nested.update({key: {'flux_map': 
-                                                        the_flux_dict[key],
+                                                        the_flux_dict[key][0],
+                                                        'ftreg': False,
                                                         'flux_map_masked_compressed':[np.array([])],
                                                         'flux_map_masked_compressed_expreg':ft_compressed_expreg}})
             else:
+                flux_means_ary, ftreg_map, ftreg_mask = self.divide_flux_map(the_flux_dict[key][0],the_flux_dict[key][1])
+
                 self.flux_maps_dict_nested.update({key: {'flux_map':
-                                                        the_flux_dict[key],
-                                                        'flux_map_masked_compressed':
-                                                        self.return_masked_compressed(the_flux_dict[key]),
-                                                        'flux_map_masked_compressed_expreg':
-                                                        self.return_masked_compressed(the_flux_dict[key], expreg=True)}})
+                                                        the_flux_dict[key][0],
+                                                        'ftreg': True,
+                                                        'ftreg_mean_fluxes':
+                                                        flux_means_ary,
+                                                        'ftreg_map':
+                                                        self.return_masked_compressed(ftreg_map).astype('int32'),
+                                                        'ftreg_mask':
+                                                        ftreg_mask}})
+                # if the_flux_dict[key][1] == 1:
+                #     self.flux_maps_dict_nested.update({key: {'flux_map':
+                #                                             the_flux_dict[key][0],
+                #                                             'ftreg': False,
+                #                                             'flux_map_masked_compressed':
+                #                                             self.return_masked_compressed(the_flux_dict[key][0]),
+                #                                             'flux_map_masked_compressed_expreg':
+                #                                             self.return_masked_compressed(the_flux_dict[key][0], expreg=True)}})
+                # else: 
+                #     flux_means_ary, ftreg_map, ftreg_mask = self.divide_flux_map(the_flux_dict[key][0],the_flux_dict[key][1])
+
+                #     self.flux_maps_dict_nested.update({key: {'flux_map':
+                #                                             the_flux_dict[key][0],
+                #                                             'ftreg': True,
+                #                                             'flux_map_masked_compressed':
+                #                                             self.return_masked_compressed(the_flux_dict[key][0]),
+                #                                             'flux_map_masked_compressed_expreg':
+                #                                             self.return_masked_compressed(the_flux_dict[key][0], expreg=True),
+                #                                             'ftreg_mean_fluxes':
+                #                                             flux_means_ary,
+                #                                             'ftreg_map':
+                #                                             self.return_masked_compressed(ftreg_map),
+                #                                             'ftreg_mask':
+                #                                             ftreg_mask}})
 
         # Create a nested dictionary of different versions of the templates
         the_dict = self.templates_dict
@@ -254,6 +288,55 @@ class ConfigMaps(SetDirs):
         self.exposure_means_list = [np.mean(expreg_values[i])
                                     for i in range(self.nexp)]
         self.exposure_mean = np.mean(self.exposure_means_list)
+
+    def divide_flux_map(self, flux_map, nftreg):
+        """ This code is for splitting flux templates into flux regions
+        """
+        # Determine the pixels in the ROI
+        pix_array = np.where(self.mask_total == False)[0]
+        flux_array = np.array([[pix_array[i], flux_map[pix_array[i]]] \
+                                for i in range(len(pix_array))])
+
+        # Stop code from dividing by more pixels than there are in the ROI
+        if nftreg > len(pix_array):
+            print("nftreg cannot be larger than the number of pixels in the ROI")
+            print("Setting nftreg = ROI size")
+            nftreg = len(pix_array)
+
+        # Sort by fluxes and divide into flux regions 
+        array_sorted = flux_array[np.argsort(flux_array[:, 1])]
+        array_split = np.array_split(array_sorted, nftreg)
+
+        ftreg_array = [np.array([array_split[i][j][0]
+                        for j in range(len(array_split[i]))], dtype='int32')
+                        for i in range(len(array_split))]
+
+        ftreg_array = [np.array([array_split[i][:,0]],dtype='int32') \
+                        for i in range(len(array_split))]
+
+        temp_ftreg_mask = []
+        for i in range(nftreg):
+            # temp_mask = np.logical_not(np.zeros(196608))
+            temp_mask = np.logical_not(np.zeros(self.npix))
+            for j in range(len(ftreg_array[i])):
+                temp_mask[ftreg_array[i][j]] = False
+            temp_ftreg_mask.append(temp_mask)
+        ftreg_mask = temp_ftreg_mask
+
+        # Store the total and region by region mean exposure
+        ftreg_values = [[array_split[i][:,1]] for i in range(len(array_split))]
+
+        flux_means_ary = np.array([np.mean(ftreg_values[i])
+                                        for i in range(nftreg)])
+
+        # ftreg_map = np.empty(196608)
+        ftreg_map = np.empty(self.npix, dtype='int32')
+        ftreg_map[:] = np.nan
+        for reg in range(nftreg):
+            for i in range(0,len(ftreg_array[reg])):
+                ftreg_map[ftreg_array[reg][i]] = reg
+
+        return [flux_means_ary,ftreg_map,ftreg_mask]
 
     def return_masked_compressed(self, map_to_mask, expreg=False):
         """ Take input map, return masked compressed version and if

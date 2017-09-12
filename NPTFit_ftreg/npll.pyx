@@ -1,5 +1,6 @@
 ###############################################################################
-# interp1d.pyx
+# npll.pyx
+# This file has been modified for implementation of flux template flux regions.
 ###############################################################################
 #
 #
@@ -19,8 +20,8 @@ cdef extern from "math.h":
     double exp(double x) nogil
 
 
-def log_like(pt_sum_compressed, theta, f_ary, df_rho_div_f_ary, ft_compressed, npt_compressed, 
-             data):
+def log_like(pt_sum_compressed, theta, f_ary, df_rho_div_f_ary, ftreg_mean_fluxes, ftreg_map, 
+             npt_compressed, data):
     """ Python wrapper for the log likelihood
 
     Organises the calculation of x_m values for multiple non-poissonian 
@@ -57,8 +58,8 @@ def log_like(pt_sum_compressed, theta, f_ary, df_rho_div_f_ary, ft_compressed, n
         # Check theta has the correct length
         assert(len(theta[i]) % 2 == 0), "theta has an invalid length!"
 
-        x_m_ary_out, x_m_sum_out = x_m.return_xs(np.array(theta[i]), f_ary, df_rho_div_f_ary, ft_compressed[i], 
-                                       npt_compressed[i], data)
+        x_m_ary_out, x_m_sum_out = x_m.return_xs(np.array(theta[i]), f_ary, df_rho_div_f_ary, ftreg_mean_fluxes[i], 
+                                       ftreg_map[i], npt_compressed[i], data)
         x_m_ary += np.asarray(x_m_ary_out)
         x_m_sum += np.asarray(x_m_sum_out)
 

@@ -287,10 +287,28 @@ class NPTFScan(ConfigMaps):
 
         self.configure_priors()
 
-        self.ft_compressed_exp_ary = \
-            [self.flux_maps_dict_nested["fm_"+ list(self.non_poiss_models.keys())[i]]
-            ['flux_map_masked_compressed_expreg']
-            for i in range(self.n_non_poiss_models)]
+        self.ft_compressed_ftreg_ary = []
+        for i in range(self.n_non_poiss_models):
+            label = "ft_"+self.non_poiss_models_keys[i]
+            if self.flux_maps_dict_nested[label]['ftreg']:
+                self.ft_compressed_ftreg_ary.append([self.flux_maps_dict_nested[label]['ftreg_mean_fluxes'], \
+                                                        self.flux_maps_dict_nested[label]['ftreg_map']])
+            else: 
+                self.ft_compressed_ftreg_ary.append([np.array([],dtype='float'),np.array([],dtype='int32')])
+            # if self.flux_maps_dict_nested[label]['ftreg']:
+            #     self.ft_compressed_ftreg_ary.append([True, \
+            #         self.flux_maps_dict_nested[label]['flux_map_masked_compressed_expreg'], \
+            #         self.flux_maps_dict_nested[label]['ftreg_mean_fluxes'], \
+            #         self.flux_maps_dict_nested[label]['ftreg_map']])
+            # else:
+            #     self.ft_compressed_ftreg_ary.append([False, \
+            #         self.flux_maps_dict_nested[label]['flux_map_masked_compressed_expreg'], \
+            #         np.array([]),np.array([])])
+
+        # self.ft_compressed_exp_ary = \
+        #     [self.flux_maps_dict_nested["ft_"+ list(self.non_poiss_models.keys())[i]]
+        #     ['flux_map_masked_compressed_expreg']
+        #     for i in range(self.n_non_poiss_models)]
 
         print('The number of parameters to be fit is', self.n_params)
 
@@ -434,12 +452,21 @@ class NPTFScan(ConfigMaps):
             # In evaluating the likelihood extract the exposure region i
             # version of each parameter
             ll += npll.log_like(self.PT_sum_compressed[i], theta_ps_expreg,
-                                self.f_ary, self.df_rho_div_f_ary,
-                                [ft[i] for ft in
-                                  self.ft_compressed_exp_ary],
-                                [NPT[i] for NPT in
-                                 self.NPT_dist_compressed_exp_ary],
-                                self.masked_compressed_data_expreg[i])
+                    self.f_ary, self.df_rho_div_f_ary,
+                    [ft[0] for ft in
+                      self.ft_compressed_ftreg_ary],
+                    [ft[1] for ft in
+                      self.ft_compressed_ftreg_ary],
+                    [NPT[i] for NPT in
+                     self.NPT_dist_compressed_exp_ary],
+                    self.masked_compressed_data_expreg[i])
+            # ll += npll.log_like(self.PT_sum_compressed[i], theta_ps_expreg,
+            #                     self.f_ary, self.df_rho_div_f_ary,
+            #                     [ft[i] for ft in
+            #                       self.ft_compressed_exp_ary],
+            #                     [NPT[i] for NPT in
+            #                      self.NPT_dist_compressed_exp_ary],
+            #                     self.masked_compressed_data_expreg[i])
         return ll
 
     def log_like_nptf(self, theta, ndim=1, nparams=1):

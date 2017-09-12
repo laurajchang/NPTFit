@@ -153,7 +153,7 @@ class Analysis:
         return samples_model_not_log
 
     def return_dndf_arrays(self, comp, flux):
-        """ Calcualte and return array of dN/dF values for the template comp
+        """ Calculate and return array of dN/dF values for the template comp
             and the given array of flux values (in counts/cm^2/s)
         """
 

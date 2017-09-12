@@ -1,0 +1,577 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ftr",
+				"ftreg_p"
+			],
+			[
+				"ftreg",
+				"ftreg_map"
+			],
+			[
+				"pref2",
+				"pref2_x_m_ary"
+			],
+			[
+				"pref1",
+				"pref1_x_m_ary"
+			],
+			[
+				"g1",
+				"g1_ary_f"
+			],
+			[
+				"ft_com",
+				"ft_compressed_ftreg_ary"
+			],
+			[
+				"non_po",
+				"non_poiss_models_keys"
+			],
+			[
+				"n_non",
+				"n_non_poiss_models"
+			],
+			[
+				"divide",
+				"divide_flux_map"
+			],
+			[
+				"flux_",
+				"flux_keys"
+			],
+			[
+				"log",
+				"log10"
+			],
+			[
+				"sb_ef",
+				"sb_eff_ary"
+			],
+			[
+				"sb_eff",
+				"sb_eff_mat"
+			],
+			[
+				"g2_r",
+				"g2_ref_mat"
+			],
+			[
+				"x_m_",
+				"x_m_sum_f"
+			],
+			[
+				"inc_",
+				"incgamma_fct_p"
+			],
+			[
+				"g2_ref",
+				"g2_ref_ary"
+			],
+			[
+				"g1_ref",
+				"g1_ref_mat"
+			],
+			[
+				"k_m",
+				"k_max_ary"
+			],
+			[
+				"dou",
+				"double_array_template"
+			],
+			[
+				"new",
+				"new_x"
+			],
+			[
+				"k",
+				"k"
+			],
+			[
+				"g1_re",
+				"g1_ref_ary"
+			],
+			[
+				"g1_r",
+				"g1_ref_ary"
+			],
+			[
+				"g2_",
+				"g2_ary_f"
+			],
+			[
+				"g2",
+				"g2_ref_mat"
+			],
+			[
+				"g",
+				"g1_ref_mat"
+			],
+			[
+				"g1_",
+				"g1_mat_f"
+			],
+			[
+				"DTE",
+				"DTYPEf_t"
+			],
+			[
+				"x",
+				"x"
+			],
+			[
+				"interp",
+				"interp1d"
+			],
+			[
+				"kmax",
+				"kmax_ary"
+			],
+			[
+				"np",
+				"npix_roi"
+			],
+			[
+				"g2_ar",
+				"g2_ary_k"
+			],
+			[
+				"incg",
+				"incgamma_lo_fct_ary"
+			],
+			[
+				"templ",
+				"template_masked_compressed_expreg"
+			],
+			[
+				"flux",
+				"flux_maps_dict_nested"
+			],
+			[
+				"fl",
+				"flux_map"
+			],
+			[
+				"tem",
+				"templates_dict"
+			],
+			[
+				"return",
+				"return_masked_compressed"
+			],
+			[
+				"masked",
+				"masked_array"
+			],
+			[
+				"c",
+				"compressed"
+			],
+			[
+				"flu",
+				"flux_template"
+			],
+			[
+				"el",
+				"elif"
+			],
+			[
+				"conce",
+				"concentration_model"
+			],
+			[
+				"l",
+				"log"
+			],
+			[
+				"rho",
+				"rho_s"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 87.0,
+		"last_filter": "install pa",
+		"selected_items":
+		[
+			[
+				"install pa",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 485.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"install",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"install",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"install ",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/laurachang/NPTFit/sftp-config.json",
+		"/Users/laurachang/NPTFit/NPTFit/interp1d.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/incgamma_fct.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/create_mask.py",
+		"/Users/laurachang/NPTFit/.gitignore",
+		"/Users/laurachang/NPTFit/NPTFit/incgamma_fct.c",
+		"/Users/laurachang/NPTFit/setup.py",
+		"/Users/laurachang/NPTFit/NPTFit/incgamma_fct_p.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/incgamma_fct.h",
+		"/Users/laurachang/Library/Application Support/Sublime Text 3/Packages/User/SFTP.errors.log",
+		"/Users/laurachang/NPTFit/NPTFit/x_m.html",
+		"/Users/laurachang/NPTFit/NPTFit/pll.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/__init__.py",
+		"/Users/laurachang/NPTFit/NPTFit/x_m.c",
+		"/Users/laurachang/NPTFit/NPTFit/npll.c",
+		"/Users/laurachang/NPTFit/NPTFit/psf_correction.py",
+		"/Users/laurachang/NPTFit/NPTFit/dnds_analysis.py",
+		"/Users/laurachang/NPTFit/NPTFit/npll.pyx",
+		"/Users/laurachang/NPTFit/NPTFit/nptf_scan.py",
+		"/Users/laurachang/NPTFit/NPTFit/config_maps.py",
+		"/Users/laurachang/NPTFit/NPTFit/x_m.pyx",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/Fermi-Subhalos-NPTF.sublime-project",
+		"/Users/laurachang/NPTFit/NPTFit/nptfit.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Ein_1em25.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Ein_1em24.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subgen.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Blazar_2Breaks.py",
+		"/Users/laurachang/cosmosis-docker/cosmosis/cosmosis-standard-library/utility/consistency/consistency.py",
+		"/Users/laurachang/cosmosis-docker/cosmosis/cosmosis-standard-library/utility/consistency/consistency_interface.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Ein_iso_only.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/astrogen.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/particle.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/nfw.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/einasto.py",
+		"/Users/laurachang/cosmosis/cosmosis/datablock/generate_sections.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Einasto_2Breaks.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/subhalo_runs/NPTF_Runs_3FGL.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/units.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/sftp-config.json",
+		"/Users/laurachang/Desktop/Princeton/Research/Fermi-Subhalos-NPTF/Fermi-Subhalos-NPTF.sublime-workspace",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_noNFW.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_Blazar_2Breaks.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_withNFW.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_Blazars_Bright.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_Blazars_withNFW.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_3FGL_Blazars_noNFW.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/sftp-config.json",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_Runs.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/astrogen.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_Runs_PS.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/notebooks/NPTF_Runs_PS.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/notebooks/NPTF_Runs.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/particle.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/subhalo_runs/NPTF_Runs_1em25.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/notebooks/Make_Fake_Data_Diffuse_Only.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/notebooks/Make_Subhalo_Template.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/nfw.py",
+		"/Users/laurachang/Desktop/Princeton/Research/Feynman/Fermi_Subhalos_NPTF/NPTF_Runs_1em25.py",
+		"/Users/laurachang/Desktop/Princeton/Feynman/From sid/sftp-config.json",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480955294/feynman/group/hepheno/smsharma/Fermi-Subhalos-NPTF/README.md",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480953839/feynman/group/hepheno/smsharma/Fermi-Subhalos-NPTF/notebooks/Make_Fake_Data.ipynb",
+		"/Users/laurachang/Desktop/Princeton/Feynman/Sid's/sftp-config.json",
+		"/Users/laurachang/Desktop/Princeton/Feynman/Fermi_Subhalos_NPTF/sftp-config.json",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480952460/feynman/group/hepheno/smsharma/Fermi-Subhalos-NPTF/data/subhalo_flux_map_1em24.npy",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/Analyze_Results.ipynb",
+		"/private/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/nfw.py",
+		"/private/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/particle.py",
+		"/private/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/units.py",
+		"/private/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480951384/mydir/group/hepheno/ljchang/Fermi_Subhalos_NPTF/subgen.py",
+		"/Users/laurachang/Library/Application Support/Sublime Text 3/Packages/User/sftp_servers/mydir",
+		"/Users/laurachang/Library/Application Support/Sublime Text 3/Packages/User/sftp_servers/feynman",
+		"/var/folders/r3/4pswdz_97nn_06pkwkztmwkc0000gn/T/sublime-sftp-browse-1480903599/feynman/group/hepheno/ljchang/Basics/Basics.ipynb",
+		"/Users/laurachang/Downloads/Analyze_Results (1).ipynb",
+		"/Users/laurachang/Basics"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"bool",
+			"self.ll",
+			"ll",
+			"ft_compressed_exp",
+			"flux_maps_dict_nested",
+			"make_ll",
+			"ft_compressed_exp",
+			"ft_compressed_expreg",
+			"label",
+			"npix",
+			"nftreg",
+			"flux_map",
+			"flux_",
+			"nexp",
+			"mask",
+			"ma",
+			"expreg",
+			"ft",
+			"expreg",
+			"mask_total",
+			"exp_",
+			"theta",
+			"self.log_like",
+			"self.ll",
+			"flux_map",
+			"add",
+			"load_",
+			"fix_model_",
+			"make_pt_sum_theta",
+			"theta_ps",
+			"self.theta",
+			"theta",
+			"convert_log",
+			"theta",
+			"npt",
+			"convert_log",
+			"non_poiss_list_is",
+			"non_poiss_is",
+			"prior",
+			"load_ma",
+			"self.n_non_poiss",
+			"theta",
+			"incomplete ",
+			"incomplete gamma",
+			"print",
+			"ll",
+			"exp_masked_compressed",
+			"exp_masked_mean",
+			"area_mask",
+			"template_sum",
+			"pixarea",
+			"mask_total",
+			"area_mask",
+			"NPT",
+			"compressed",
+			"non_poiss",
+			"npt",
+			"masked_compressed",
+			"template_sum",
+			"mask_total",
+			"area_mask",
+			"pixarea",
+			"area_mask",
+			"dndf",
+			"self.ll",
+			"load_non_",
+			"non_poi",
+			"nexp",
+			"error",
+			"print",
+			"error",
+			"error while",
+			"print",
+			"nexp",
+			"npll",
+			"log_like",
+			"nbreak_ary",
+			"theta_ps_ary",
+			"theta",
+			"PT_sum_compressed",
+			"npll",
+			"theta_ps_ary",
+			"theta_ps",
+			"make_ll",
+			"make_pt_sum_theta",
+			"theta",
+			"internal",
+			"theta",
+			"self.masked_compressed_data",
+			"npix",
+			"interp1d",
+			"k_max_ary",
+			"ndarray",
+			"ft_compres",
+			"ft_com",
+			"ones",
+			"flux_maps",
+			"kmax",
+			"sb_ary",
+			"self.ft_compressed_exp_ary",
+			"npll",
+			"k_max",
+			"f_ary",
+			"assert",
+			"ft_compressed",
+			"compressed_flux_map",
+			"self.ft_compressed_exp_ary",
+			"self.ft_dist_compressed_exp_ary",
+			"self.ft",
+			"self.flux",
+			"self.NPT_dist_",
+			"self.templates_dict_",
+			"self.npt",
+			"npll",
+			"self.templates_dict_nested",
+			"flux_maps",
+			"pll",
+			"x_m",
+			"npll",
+			"templates_dict_nested",
+			"compress",
+			"for i in range",
+			"self.templates",
+			"n_break",
+			"print",
+			"npll",
+			"templates_dict_nested",
+			"compressed"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"folder"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.sftp":
+	{
+		"height": 106.0
+	},
+	"pinned_build_system": "Packages/Python/Python.sublime-build",
+	"project": "matplotlibrc.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				".gitignore"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 228.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
